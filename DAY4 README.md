@@ -1,213 +1,149 @@
 # Machine Learning – Daily Task Update
-## Day 4: Python Collections and Functions
+## Day 4: Organizing Data with Collections and Functions
 
-### 1. What Are Collections?
-Collections store multiple values in a single object. Python's main built-in collection types are lists, tuples, sets, and dictionaries. They differ in ordering, mutability, and how values are accessed.
+Once a program has more than a few values, separate variables become awkward. Python collections keep related information together, and functions give a task a name so it can be reused. Both ideas are useful when preparing data for analysis.
 
-### 2. Lists
-A list is an ordered, mutable collection that allows duplicate values.
+### 1. Pick a collection that fits the job
+**List:** An ordered, changeable collection. Lists can contain duplicate values.
 
-```python
-marks = [75, 82, 91, 82]
-print(marks[0])   # 75
+\`\`\`python
+marks = [78, 91, 84, 78]
 marks.append(88)
-marks[1] = 85
 print(marks)
-```
+print(marks[0])  # First item
+\`\`\`
 
-Indexes start at 0. Negative indexing starts from the end, so `marks[-1]` accesses the final item. Lists support methods such as `append()`, `remove()`, `sort()`, and `pop()`.
+List positions start at zero. Negative indexes count from the end, so \`marks[-1]\` returns the last item.
 
-### 3. Tuples
-A tuple is an ordered collection that cannot be reassigned item by item after creation.
+**Tuple:** An ordered collection that cannot be reassigned item by item after creation.
 
-```python
-coordinates = (10, 20)
+\`\`\`python
+coordinates = (10, 25)
 print(coordinates[0])
-```
+\`\`\`
 
-Tuples are useful for fixed groups of values. A tuple can contain a mutable object, so immutability of a tuple does not automatically make every object inside it immutable.
+**Set:** A collection of unique values. Sets help remove duplicates or check membership, but they do not provide stable positional indexing.
 
-### 4. Sets
-A set stores unique elements and is useful for membership checks and set operations. Sets do not support positional indexing.
+\`\`\`python
+cities = {"Indore", "Bhopal", "Indore"}
+print(cities)  # Each city appears once
+\`\`\`
 
-```python
-numbers = {1, 2, 2, 3}
-print(numbers)       # {1, 2, 3}
-print(2 in numbers)  # True
+**Dictionary:** Stores values using keys. It is handy when each value has a label.
 
-a = {1, 2, 3}
-b = {3, 4, 5}
-print(a | b)  # Union
-print(a & b)  # Intersection
-print(a - b)  # Difference
-```
-
-Set display order should not be relied upon. Elements must be hashable.
-
-### 5. Dictionaries
-A dictionary stores key-value pairs. Keys are unique and must be hashable.
-
-```python
-student = {
-    "name": "Asha",
-    "age": 21,
-    "marks": 88
-}
-
+\`\`\`python
+student = {"name": "Asha", "marks": 86, "city": "Indore"}
 print(student["name"])
-student["marks"] = 92
-student["city"] = "Indore"
-print(student.get("grade", "Not assigned"))
-```
+student["marks"] = 90
+\`\`\`
 
-Use `get()` when a key may not exist and you want a default value rather than a `KeyError`.
+Use \`student.get("email")\` when a key might not exist and you want to avoid a \`KeyError\`.
 
-### 6. Collection Comparison
+### 2. Loop through a collection
+Collections become more useful when we process their contents.
 
-| Collection | Ordered | Mutable | Duplicates | Access |
-|---|---|---|---|---|
-| List | Yes | Yes | Allowed | Index |
-| Tuple | Yes | No (structure) | Allowed | Index |
-| Set | No positional order | Yes | Not stored as duplicates | Membership |
-| Dictionary | Insertion order | Yes | Keys unique | Key |
+\`\`\`python
+marks = [78, 91, 84, 65]
+total = 0
+for mark in marks:
+    total += mark
 
-### 7. Indexing and Slicing
-Indexing selects one item. Slicing selects a range using `sequence[start:stop:step]`; the stop index is excluded.
+average = total / len(marks)
+print(f"Average: {average:.2f}")
+\`\`\`
 
-```python
-values = [10, 20, 30, 40, 50]
-print(values[1])     # 20
-print(values[1:4])   # [20, 30, 40]
-print(values[:3])    # [10, 20, 30]
-print(values[::2])   # [10, 30, 50]
-print(values[::-1])  # reversed copy
-```
+For dictionaries, \`items()\` gives you each key and value:
 
-### 8. Mutable vs. Immutable Objects
-Mutable objects can be changed after creation; lists, sets, and dictionaries are common examples. Immutable objects cannot be changed in place; integers, floats, strings, and tuples (as containers) are common examples.
+\`\`\`python
+student = {"name": "Asha", "marks": 86}
+for key, value in student.items():
+    print(f"{key}: {value}")
+\`\`\`
 
-```python
-first = [1, 2]
-second = first
-second.append(3)
-print(first)  # [1, 2, 3]
-```
+### 3. Turn repeated steps into a function
+A function groups statements under a name. It can accept inputs (parameters) and return a result.
 
-Both variables refer to the same list. If an independent shallow copy is needed, use `first.copy()` or `first[:]` for a list.
+\`\`\`python
+def calculate_average(values):
+    if not values:
+        raise ValueError("Please provide at least one value.")
+    return sum(values) / len(values)
 
-### 9. Functions
-A function is a reusable block of code that performs a task. Define it using `def`. Parameters receive input values; `return` sends a result back to the caller.
+marks = [78, 91, 84]
+print(calculate_average(marks))
+\`\`\`
 
-```python
-def calculate_average(numbers):
-    if not numbers:
-        return None
-    return sum(numbers) / len(numbers)
+The function works with different lists, so we do not need to rewrite the calculation each time. A \`return\` statement sends a value back to the caller; \`print()\` only displays something.
 
-print(calculate_average([70, 80, 90]))  # 80.0
-```
+Functions can also have default parameters:
 
-A function that reaches the end without a `return` statement returns `None`.
+\`\`\`python
+def greet(name, greeting="Hello"):
+    return f"{greeting}, {name}!"
 
-### 10. Parameters and Arguments
-- **Parameter:** A name in the function definition.
-- **Argument:** The actual value passed when calling the function.
-- **Default argument:** A parameter value used when no argument is supplied.
-- **Keyword argument:** An argument passed by parameter name.
+print(greet("Mina"))
+print(greet("Ravi", "Welcome"))
+\`\`\`
 
-```python
-def greet(name, message="Welcome"):
-    return f"{message}, {name}!"
+Choose names that describe the task, keep functions focused and validate inputs when invalid values would cause confusing results.
 
-print(greet("Riya"))
-print(greet(name="Aman", message="Hello"))
-```
+### 4. A shorter way to build a list
+A list comprehension creates a list from an iterable, optionally applying a condition.
 
-Avoid mutable default values such as `items=[]` unless you deliberately want shared state between calls.
+\`\`\`python
+marks = [35, 72, 41, 28, 90]
+passed = [mark for mark in marks if mark >= 40]
+squared = [number ** 2 for number in range(1, 6)]
+print(passed)
+print(squared)
+\`\`\`
 
-### 11. Lambda, `map()`, and `filter()`
-A lambda is a small anonymous function expression, commonly used for simple operations.
+The first example keeps passing marks. Comprehensions are concise, but a normal loop is often easier to understand when the logic has several steps.
 
-```python
-square = lambda x: x * x
-print(square(5))  # 25
-```
+### 5. Lambda, map and filter
+A **lambda** is a small anonymous function. It is useful for short operations, not a replacement for every named function.
 
-`map()` applies a function to each item; `filter()` retains items that satisfy a condition. In Python 3, both return iterators.
+\`\`\`python
+double = lambda number: number * 2
+print(double(6))
+\`\`\`
 
-```python
+\`map()\` applies a function to each item; \`filter()\` keeps items for which a condition is true. In Python 3, both return iterators, so convert to a list if you need all results immediately.
+
+\`\`\`python
 numbers = [1, 2, 3, 4, 5]
-squares = list(map(lambda x: x * x, numbers))
-evens = list(filter(lambda x: x % 2 == 0, numbers))
+doubled = list(map(lambda n: n * 2, numbers))
+evens = list(filter(lambda n: n % 2 == 0, numbers))
+print(doubled)
+print(evens)
+\`\`\`
 
-print(squares)  # [1, 4, 9, 16, 25]
-print(evens)    # [2, 4]
-```
+For many beginner tasks, a list comprehension is more readable than combining \`map()\`, \`filter()\` and lambda expressions.
 
-List comprehensions are often easier to read for these simple cases.
+### 6. Recursion: a function that calls itself
+Recursion solves a problem by reducing it to a smaller version of the same problem. It needs a **base case** so that calls eventually stop.
 
-### 12. Comprehensions
-A comprehension creates a collection from an iterable, optionally filtering or transforming items.
-
-```python
-numbers = [1, 2, 3, 4, 5]
-squares = [n * n for n in numbers]
-evens = [n for n in numbers if n % 2 == 0]
-unique_lengths = {len(word) for word in ["cat", "dog", "apple"]}
-```
-
-Dictionary comprehensions can create key-value mappings:
-
-```python
-squares_by_number = {n: n * n for n in range(1, 5)}
-```
-
-### 13. Recursion
-Recursion occurs when a function calls itself to solve a smaller version of a problem. A recursive solution needs a base case to stop the calls.
-
-```python
+\`\`\`python
 def factorial(n):
     if n < 0:
         raise ValueError("n must be non-negative")
-    if n <= 1:
+    if n in (0, 1):
         return 1
     return n * factorial(n - 1)
 
 print(factorial(5))  # 120
-```
+\`\`\`
 
-Deep recursion can hit Python's recursion limit; an iterative solution is often more appropriate for large inputs.
+Recursion is useful for some tree and divide-and-conquer problems. For straightforward repetition, a loop is often simpler and avoids Python's recursion-depth limit.
 
-### 14. Practical Exercises
-1. Find the minimum and maximum values in a list.
-2. Remove duplicates while preserving the original order.
-3. Count each word's frequency using a dictionary.
-4. Write reusable functions for mean, minimum, and maximum.
-5. Check whether a word is a palindrome.
-6. Implement factorial using both iteration and recursion.
-7. Use a comprehension to select even numbers and square them.
+### Practice task
+Create a dictionary for a student with a name, marks in several subjects and a city. Write functions to calculate the average and return a list of passed subjects. Test the functions with an empty list and explain how your code handles it.
 
-**Example: remove duplicates while preserving order**
+**Practical objective:** Select suitable Python collections and write reusable functions to process grouped data.
 
-```python
-values = [3, 1, 3, 2, 1, 4]
-unique_values = list(dict.fromkeys(values))
-print(unique_values)  # [3, 1, 2, 4]
-```
-
-### 15. Key Takeaways
-- Lists, tuples, sets, and dictionaries have different use cases.
-- Indexing starts at zero; slicing excludes the stop index.
-- Mutable objects can change in place, which affects references.
-- Functions support reuse and organization; `return` provides a result.
-- Lambda, `map()`, `filter()`, and comprehensions support concise transformations.
-- Recursion needs a base case.
-
-**Practical Objective:** Select the right collection, manipulate data safely, and write reusable functions for common operations.
-
-**GeeksforGeeks References:**
-- [Python Data Structures](https://www.geeksforgeeks.org/python/python-data-structures/)
+**GeeksforGeeks references**
+- [Python Lists](https://www.geeksforgeeks.org/python/python-list/)
+- [Python Dictionaries](https://www.geeksforgeeks.org/python/python-dictionary/)
 - [Python Functions](https://www.geeksforgeeks.org/python/python-functions/)
-- [Python Lambda](https://www.geeksforgeeks.org/python/python-lambda/)
-- [Python List Comprehension](https://www.geeksforgeeks.org/python/python-list-comprehension/)
-- [Recursion in Python](https://www.geeksforgeeks.org/python/recursion-in-python/)
+- [List Comprehension](https://www.geeksforgeeks.org/python-list-comprehension/)
+- [Lambda, Map and Filter](https://www.geeksforgeeks.org/python/python-map-function/)
