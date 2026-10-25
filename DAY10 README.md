@@ -1,134 +1,108 @@
 # Machine Learning – Daily Task Update
-## Day 10: Pandas and Data Manipulation
+## Day 10: Exploring and Manipulating Data with Pandas
 
-### 1. What Is Pandas?
-Pandas is a Python library for working with labelled, tabular, and time-series data. It is widely used for loading datasets, inspecting data, cleaning values, filtering records, grouping, joining tables, and preparing data for visualization and Machine Learning.
+NumPy is great for numerical arrays. Real datasets, however, usually have column names, mixed data types, dates and missing entries. Pandas gives us a convenient table-like structure for inspecting and preparing that kind of data before visualization or model training.
 
-Install and import:
+### 1. Meet Series and DataFrames
+A **Series** is a one-dimensional collection with labels. A **DataFrame** is a two-dimensional table whose columns can hold different types of data.
 
-```bash
-python -m pip install pandas openpyxl
-```
-
-```python
-import pandas as pd
-```
-
-`openpyxl` is commonly used by Pandas to read and write `.xlsx` Excel files.
-
-### 2. Series and DataFrame
-A **Series** is a one-dimensional labelled array. A **DataFrame** is a two-dimensional table with labelled rows and columns.
-
-```python
+\`\`\`python
 import pandas as pd
 
 marks = pd.Series([80, 90, 85], name="marks")
 students = pd.DataFrame({
     "name": ["Asha", "Ravi", "Mina"],
-    "marks": [80, 90, 85]
-})
-
-print(marks)
-print(students)
-```
-
-A DataFrame can contain columns with different data types, such as text, integers, floating-point numbers, and dates.
-
-### 3. Reading CSV and Excel Files
-```python
-df_csv = pd.read_csv("students.csv")
-df_excel = pd.read_excel("students.xlsx")
-
-print(df_csv.head())
-```
-
-Other useful options include `sep=` for a different delimiter, `encoding=` for text encoding, and `sheet_name=` for selecting an Excel sheet.
-
-Always check the file path and inspect the loaded data rather than assuming it was interpreted correctly.
-
-### 4. Inspecting a Dataset
-Common inspection methods:
-- `head()` and `tail()`: Preview rows.
-- `shape`: Number of rows and columns.
-- `columns`: Column names.
-- `dtypes`: Column data types.
-- `info()`: Non-null counts and data types.
-- `describe()`: Summary statistics for selected columns.
-- `isna().sum()`: Missing-value counts.
-
-```python
-print(df_csv.head())
-print(df_csv.shape)
-print(df_csv.columns)
-print(df_csv.dtypes)
-print(df_csv.info())
-print(df_csv.describe(include="all"))
-print(df_csv.isna().sum())
-```
-
-Dataset inspection should happen before cleaning or analysis because it helps reveal missing values, unexpected types, and inconsistent columns.
-
-### 5. Selecting Columns and Rows
-```python
-df = pd.DataFrame({
-    "name": ["Asha", "Ravi", "Mina"],
     "marks": [80, 90, 85],
     "city": ["Indore", "Bhopal", "Indore"]
 })
 
-print(df["name"])                # One column as a Series
-print(df[["name", "marks"]])     # Multiple columns as a DataFrame
-print(df.loc[0, "name"])         # Label-based selection
-print(df.iloc[0, 1])             # Position-based selection
-```
+print(marks)
+print(students)
+\`\`\`
 
-`loc` selects by index and column labels; `iloc` selects by integer position. An index label is not necessarily the same as a row's position.
+Install Pandas with \`python -m pip install pandas openpyxl\`. The \`openpyxl\` package is commonly used for working with Excel \`.xlsx\` files.
 
-### 6. Filtering and Sorting
-Boolean filtering selects rows that meet a condition.
+### 2. Load a file and inspect it before changing anything
+\`\`\`python
+df = pd.read_csv("students.csv")
+print(df.head())
+print(df.shape)
+print(df.columns)
+print(df.dtypes)
+print(df.info())
+print(df.describe(include="all"))
+print(df.isna().sum())
+\`\`\`
 
-```python
-passed = df[df["marks"] >= 85]
+Useful inspection tools include:
+- \`head()\` and \`tail()\`: preview the first or last rows.
+- \`shape\`: number of rows and columns.
+- \`columns\`: column names.
+- \`dtypes\`: data types inferred for each column.
+- \`info()\`: non-null counts and memory information.
+- \`describe()\`: summary statistics.
+- \`isna().sum()\`: missing-value counts.
+
+For Excel files, use \`pd.read_excel("students.xlsx")\`. Check the path, column names and inferred types rather than assuming the file loaded exactly as intended.
+
+### 3. Select a useful part of the table
+\`\`\`python
+print(df["name"])                 # One column: Series
+print(df[["name", "marks"]])      # Several columns: DataFrame
+print(df.loc[0, "name"])          # Label-based selection
+print(df.iloc[0, 1])              # Position-based selection
+\`\`\`
+
+\`loc\` uses index and column labels, while \`iloc\` uses integer positions. An index label does not always equal a row's position, especially after filtering or sorting.
+
+### 4. Filter rows and sort results
+Boolean filtering is one of the most common operations in data analysis.
+
+\`\`\`python
+passed = df[df["marks"] >= 40]
 indore_students = df[df["city"] == "Indore"]
-top_indore = df[(df["city"] == "Indore") & (df["marks"] >= 85)]
+top_indore = df[
+    (df["city"] == "Indore") & (df["marks"] >= 85)
+]
 
 sorted_df = df.sort_values("marks", ascending=False)
-print(passed)
 print(top_indore)
 print(sorted_df)
-```
+\`\`\`
 
-Use `&` for element-wise AND and `|` for element-wise OR, and wrap each condition in parentheses. Do not use Python's `and` or `or` for combining Pandas Series conditions.
+Use \`&\` for element-wise AND and \`|\` for element-wise OR. Put each condition in parentheses. Python's \`and\` and \`or\` operators are not suitable for combining Pandas Series conditions.
 
-### 7. Creating and Updating Columns
-A new column can be calculated from existing columns.
+### 5. Add calculated columns
+You can create a new column from values already in the table.
 
-```python
+\`\`\`python
 df["passed"] = df["marks"] >= 40
 df["bonus_marks"] = df["marks"] + 5
-```
+\`\`\`
 
-Derived columns are useful for feature engineering, but ensure that they make sense for the problem and do not accidentally use information that would not be available at prediction time.
+In ML, derived columns may become features. Before using one, ask whether it would genuinely be available at the time a prediction is made. A feature containing information from the future can leak the answer into the model and produce misleading evaluation results.
 
-### 8. Grouping and Aggregation
-`groupby()` splits rows into groups, applies an operation, and combines the results. It is useful for group-level summaries.
+### 6. Summarize groups of records
+\`groupby()\` splits data into groups, applies an aggregation and combines the results. For example, we might want total and average sales by region.
 
-```python
+\`\`\`python
 sales = pd.DataFrame({
     "region": ["North", "South", "North", "South"],
     "sales": [100, 150, 200, 120]
 })
 
-summary = sales.groupby("region")["sales"].agg(["sum", "mean", "count"])
+summary = sales.groupby("region")["sales"].agg(
+    ["sum", "mean", "count"]
+)
 print(summary)
-```
+\`\`\`
 
-This returns total sales, average sales per record, and the number of records for each region.
+This gives the total, average and number of records for each region. Grouping is useful for answering questions before building a model, such as which regions have the highest average sales.
 
-### 9. Merging, Joining and Concatenation
-**Merge:** Combines tables using one or more matching keys, similar to a database join.
+### 7. Combine related tables
+A customer table and an order table may share a customer ID. A merge connects rows using that key.
 
-```python
+\`\`\`python
 customers = pd.DataFrame({
     "customer_id": [1, 2],
     "name": ["Asha", "Ravi"]
@@ -138,85 +112,59 @@ orders = pd.DataFrame({
     "amount": [500, 300, 700]
 })
 
-merged = pd.merge(customers, orders, on="customer_id", how="left")
+merged = pd.merge(
+    customers, orders, on="customer_id", how="left"
+)
 print(merged)
-```
+\`\`\`
 
-Common merge types:
-- `inner`: Only matching keys.
-- `left`: All keys from the left table plus matches.
-- `right`: All keys from the right table plus matches.
-- `outer`: All keys from both tables.
+Common merge types are \`inner\` (matching keys only), \`left\` (all left rows and any matches), \`right\` (all right rows and matches) and \`outer\` (all keys from both tables). Check whether keys are unique: duplicate keys can multiply rows during a merge.
 
-**Concatenation:** Stacks objects along rows or columns rather than matching records by a key.
+\`pd.concat()\` serves a different purpose: it stacks objects along rows or columns rather than matching records by a key.
 
-```python
-combined_rows = pd.concat([df, df], ignore_index=True)
-```
+### 8. Make dates useful
+Dates often arrive as strings. Convert them before extracting date parts or sorting chronologically.
 
-Before merging, check key uniqueness and row counts; duplicate keys can create more rows than expected.
+\`\`\`python
+df["order_date"] = pd.to_datetime(df["order_date"])
+df["year"] = df["order_date"].dt.year
+df["month"] = df["order_date"].dt.month
+df["day_name"] = df["order_date"].dt.day_name()
+\`\`\`
 
-### 10. Date and Time Processing
-Use `pd.to_datetime()` to convert date strings into datetime values.
+If the source has an unusual date format, you may need to provide \`format=\`. Real event timestamps may also require attention to time zones.
 
-```python
-df_dates = pd.DataFrame({
-    "order_date": ["2026-01-05", "2026-02-10", "2026-02-20"]
-})
+### 9. Decide what to do with missing values
+Pandas can represent missing data with markers such as \`NaN\`, \`None\` or \`NaT\`. Start by counting missing values:
 
-df_dates["order_date"] = pd.to_datetime(df_dates["order_date"])
-df_dates["year"] = df_dates["order_date"].dt.year
-df_dates["month"] = df_dates["order_date"].dt.month
-df_dates["day_name"] = df_dates["order_date"].dt.day_name()
+\`\`\`python
+print(df.isna().sum())
+\`\`\`
 
-print(df_dates)
-```
+You may remove some incomplete rows with \`dropna()\`, fill values with a justified constant or summary statistic, or use a more advanced imputation method. Replacing every missing value with zero is rarely a safe default because zero may have a real meaning.
 
-Date parsing may need options such as `format=` or handling of invalid values. Time zones matter when timestamps represent real-world events across regions.
+For ML, calculate imputation values using the training data only, then apply the same transformation to validation, test and future data. This helps prevent data leakage.
 
-### 11. Handling Missing Values
-Pandas represents missing values using markers such as `NaN`, `None`, or `NaT`, depending on data type.
+### 10. Save the processed result
+\`\`\`python
+df.to_csv("processed_students.csv", index=False)
+df.to_excel("processed_students.xlsx", index=False)
+\`\`\`
 
-```python
-print(df_csv.isna().sum())
-cleaned = df_csv.dropna()
-```
+Using \`index=False\` prevents the DataFrame index from being written as an extra column when it is not needed.
 
-Dropping all rows with missing values is only one possible approach. Other strategies include filling with a meaningful constant, median, mode, or a model-based estimate. Choose a strategy based on the data and problem rather than replacing every missing value with zero.
+### Practice task: explore a small sales dataset
+1. Load a CSV and inspect its rows, columns, types and missing values.
+2. Filter the records for one region and sort them by sales.
+3. Calculate total and average sales for each region.
+4. Merge sales with a customer table using a customer ID.
+5. Extract the month from each order date.
+6. Choose a reasonable approach for missing values and explain why.
+7. Export the cleaned table to a new CSV file.
 
-For ML, learn imputation values from training data only and apply the same transformation to validation, test, and future data to avoid leakage.
+**Practical objective:** Load, inspect, filter, summarize, combine and export tabular data as preparation for exploratory data analysis and machine learning.
 
-### 12. Exporting Data
-```python
-df_csv.to_csv("processed_data.csv", index=False)
-df_csv.to_excel("processed_data.xlsx", index=False)
-```
-
-`index=False` avoids exporting the DataFrame index as an additional column when it is not needed.
-
-### 13. Practical Exercise: Sales Data Analysis
-Create or load a sales dataset and complete these tasks:
-1. Inspect rows, columns, data types, and missing values.
-2. Filter records for one region.
-3. Sort sales from highest to lowest.
-4. Calculate total and average sales by region.
-5. Merge sales with customer information using a customer ID.
-6. Extract month and year from order dates.
-7. Export the processed dataset to CSV.
-
-### 14. Key Takeaways
-- A Series is one-dimensional; a DataFrame is two-dimensional.
-- Inspect data before changing it.
-- Use selection and Boolean filtering to retrieve records.
-- `groupby()` summarizes data by category.
-- `merge()` combines tables by keys; `concat()` stacks data along an axis.
-- Date-time conversion enables date-based analysis.
-- Missing values require a considered strategy.
-- Exporting creates reusable processed datasets.
-
-**Practical Objective:** Load, inspect, filter, aggregate, combine, and export real-world tabular data using Pandas as a foundation for exploratory data analysis and ML.
-
-**GeeksforGeeks References:**
+**GeeksforGeeks references**
 - [Pandas Tutorial](https://www.geeksforgeeks.org/python/pandas-tutorial/)
 - [Pandas Series](https://www.geeksforgeeks.org/python/python-pandas-series/)
 - [Pandas DataFrame](https://www.geeksforgeeks.org/python/python-pandas-dataframe/)
