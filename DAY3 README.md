@@ -1,247 +1,119 @@
 # Machine Learning – Daily Task Update
-## Day 3: Conditional Statements and Loops
+## Day 3: Making Decisions and Repeating Work in Python
 
-### 1. Boolean Expressions
-A Boolean expression is an expression that evaluates to `True` or `False`. It is used to make decisions in a program.
+Programs become useful when they can react to different inputs and repeat a task without copying the same code again and again. Conditions handle decisions; loops handle repetition. Both are common in data preparation and in the logic around ML applications.
 
-```python
-age = 19
-print(age >= 18)  # True
-```
+### 1. Start with a true-or-false question
+A Boolean expression evaluates to either \`True\` or \`False\`.
 
-Boolean expressions often use comparison operators such as `>`, `<`, `==`, and `!=`, or logical operators such as `and`, `or`, and `not`.
+\`\`\`python
+marks = 68
+passed = marks >= 40
+print(passed)  # True
+\`\`\`
 
-### 2. The `if` Statement
-An `if` statement runs a block of code only when its condition is true.
+Comparison operators include \`==\`, \`!=\`, \`>\`, \`<\`, \`>=\` and \`<=\`. Combine conditions with \`and\`, \`or\` and \`not\`.
 
-```python
-marks = 72
+\`\`\`python
+marks = 68
+attendance = 0.82
+eligible = marks >= 40 and attendance >= 0.75
+print(eligible)
+\`\`\`
 
-if marks >= 40:
-    print("Pass")
-```
+### 2. Use conditions when the program needs a choice
+An \`if\` statement runs a block only when its condition is true. \`elif\` checks another possibility, while \`else\` handles the remaining case.
 
-The condition is checked first. If it evaluates to `True`, the indented block executes; otherwise, it is skipped.
-
-### 3. `if-else`
-`else` provides an alternative block when the `if` condition is false.
-
-```python
-number = 7
-
-if number % 2 == 0:
-    print("Even")
-else:
-    print("Odd")
-```
-
-The modulo operator `%` returns the remainder. A number divisible by 2 has remainder 0.
-
-### 4. `if-elif-else`
-Use `elif` to test multiple conditions in order. Only the first matching branch is executed.
-
-```python
-marks = 83
+\`\`\`python
+marks = float(input("Enter marks: "))
 
 if marks >= 90:
     grade = "A"
 elif marks >= 75:
     grade = "B"
-elif marks >= 60:
+elif marks >= 40:
     grade = "C"
 else:
-    grade = "D"
+    grade = "Needs improvement"
 
-print(grade)  # B
-```
+print(f"Grade: {grade}")
+\`\`\`
 
-Conditions should be arranged carefully. For grading, checking `marks >= 60` before `marks >= 90` would incorrectly classify high marks as C.
+The order matters. Python checks conditions from top to bottom and executes the first matching branch. Checking \`marks >= 40\` before \`marks >= 90\` would incorrectly assign grade C to a score of 95.
 
-### 5. Nested Conditions
-A nested condition is an `if` statement placed inside another conditional block. It is useful when a second decision depends on the first.
+### 3. Choose the right kind of loop
+Use a **for loop** to visit items in a sequence or repeat a task a known number of times. Use a **while loop** when repetition depends on a condition that may change.
 
-```python
-age = 20
-has_id = True
+\`\`\`python
+subjects = ["Maths", "Python", "Statistics"]
+for subject in subjects:
+    print(f"Today's subject: {subject}")
+\`\`\`
 
-if age >= 18:
-    if has_id:
-        print("Entry allowed")
-    else:
-        print("ID required")
-else:
-    print("Entry not allowed")
-```
+The \`range()\` function generates a sequence of integers. Its stop value is excluded:
 
-Avoid unnecessary nesting when a simple logical expression is clearer.
-
-### 6. The `for` Loop
-A `for` loop iterates over the items in a sequence or other iterable, such as a list, string, or range.
-
-```python
-for name in ["Asha", "Ravi", "Mina"]:
-    print(name)
-```
-
-The loop runs once for each item.
-
-### 7. The `range()` Function
-`range()` generates a sequence of integers, often used in loops.
-
-- `range(stop)`: starts at 0 and stops before `stop`.
-- `range(start, stop)`: starts at `start` and stops before `stop`.
-- `range(start, stop, step)`: advances by `step`.
-
-```python
+\`\`\`python
 for number in range(1, 6):
-    print(number)
-```
+    print(number)  # 1 through 5
+\`\`\`
 
-Output: `1 2 3 4 5` on separate lines. The ending value 6 is excluded.
+A \`while\` loop keeps running while its condition is true:
 
-### 8. The `while` Loop
-A `while` loop repeats while its condition remains true.
+\`\`\`python
+attempts = 0
+while attempts < 3:
+    print("Attempt", attempts + 1)
+    attempts += 1
+\`\`\`
 
-```python
-count = 1
+Update the condition or the values it depends on; otherwise, a while loop may never end.
 
-while count <= 5:
-    print(count)
-    count += 1
-```
+### 4. Change how a loop behaves
+- \`break\` exits the loop immediately.
+- \`continue\` skips the rest of the current iteration and moves to the next one.
+- \`pass\` is a placeholder statement that does nothing.
 
-The variable changes each time, so the condition eventually becomes false. If the condition never becomes false and the loop is not interrupted, the program may run indefinitely.
-
-**`for` vs. `while`:**
-- Use `for` when iterating over a collection or known range.
-- Use `while` when repetition depends on a condition or user input.
-
-### 9. `break`, `continue`, and `pass`
-- **`break`:** Immediately exits the nearest enclosing loop.
-- **`continue`:** Skips the rest of the current iteration and moves to the next iteration.
-- **`pass`:** Does nothing; it is a placeholder where Python syntax requires a statement.
-
-```python
-for number in range(1, 6):
+\`\`\`python
+for number in range(1, 8):
     if number == 3:
         continue
-    if number == 5:
+    if number == 6:
         break
     print(number)
-```
+\`\`\`
 
-Output: `1`, `2`, `4`. The value 3 is skipped, and the loop ends at 5.
+This prints 1, 2, 4 and 5. Use these statements when they make the logic clearer; too many branches inside a loop can make it hard to follow.
 
-### 10. Nested Loops and Patterns
-A nested loop is a loop inside another loop. For each iteration of the outer loop, the inner loop runs through its iterations.
+### 5. Put the ideas together: a small data check
+Suppose you have marks and want to count how many students passed.
 
-```python
-for row in range(1, 4):
-    for column in range(1, 4):
-        print("*", end=" ")
-    print()
-```
+\`\`\`python
+marks_list = [35, 72, 41, 28, 90, 64]
+passed_count = 0
 
-Output:
+for marks in marks_list:
+    if marks >= 40:
+        passed_count += 1
 
-```text
-* * *
-* * *
-* * *
-```
+print(f"Students who passed: {passed_count}")
+\`\`\`
 
-Nested loops are useful for grids, tables, and combinations, but can become slow when both loops process large collections.
+The loop visits each mark, the condition checks the threshold and the counter records how many satisfy it. This small pattern appears in larger data-processing tasks too.
 
-### 11. Practical Programs
-**A. Largest of three numbers**
+### 6. Mistakes worth checking
+- Using \`=\` where a comparison \`==\` is needed.
+- Forgetting the colon after \`if\`, \`elif\`, \`else\`, \`for\` or \`while\`.
+- Incorrect indentation.
+- Creating a while loop whose condition never becomes false.
+- Misunderstanding the stop value in \`range(start, stop)\`.
 
-```python
-a = float(input("First number: "))
-b = float(input("Second number: "))
-c = float(input("Third number: "))
+### Practice task
+Write a program that asks for five marks, stores them in a list and prints whether each student passed. Then calculate how many passed and how many did not. Try boundary values such as 39, 40 and 41 to check your conditions.
 
-if a >= b and a >= c:
-    largest = a
-elif b >= a and b >= c:
-    largest = b
-else:
-    largest = c
+**Practical objective:** Use Boolean expressions, conditional branches and loops to solve small decision-making and counting problems.
 
-print("Largest:", largest)
-```
-
-**B. Multiplication table**
-
-```python
-number = int(input("Enter a number: "))
-
-for i in range(1, 11):
-    print(f"{number} x {i} = {number * i}")
-```
-
-**C. Factorial using a loop**
-
-The factorial of a non-negative integer `n` is the product of all integers from 1 to `n`. By definition, `0! = 1`.
-
-```python
-n = int(input("Enter a non-negative integer: "))
-
-if n < 0:
-    print("Factorial is not defined for negative integers.")
-else:
-    factorial = 1
-    for i in range(1, n + 1):
-        factorial *= i
-    print("Factorial:", factorial)
-```
-
-**D. Prime-number check**
-
-A prime number is an integer greater than 1 with exactly two positive divisors: 1 and itself.
-
-```python
-n = int(input("Enter an integer: "))
-
-if n < 2:
-    is_prime = False
-else:
-    is_prime = True
-    for divisor in range(2, int(n ** 0.5) + 1):
-        if n % divisor == 0:
-            is_prime = False
-            break
-
-print("Prime" if is_prime else "Not prime")
-```
-
-It is sufficient to test divisors up to the square root of `n`: if a larger factor exists, it must pair with a smaller factor.
-
-**E. Fibonacci sequence**
-
-Each Fibonacci number after the first two is the sum of the previous two numbers.
-
-```python
-terms = int(input("Number of terms: "))
-a, b = 0, 1
-
-for _ in range(max(0, terms)):
-    print(a, end=" ")
-    a, b = b, a + b
-print()
-```
-
-### 12. Key Takeaways
-- Conditions control which code blocks run.
-- `if`, `elif`, and `else` handle alternative paths.
-- `for` iterates over items; `while` repeats while a condition is true.
-- `range()` excludes its stop value.
-- `break`, `continue`, and `pass` have different purposes.
-- Loops can automate repeated calculations, including factorials, prime checks, and sequences.
-
-**Practical Objective:** Use conditions and loops to solve simple logic problems and explain the flow of execution.
-
-**GeeksforGeeks References:**
+**GeeksforGeeks references**
 - [Python If-Else](https://www.geeksforgeeks.org/python/python-if-else/)
-- [Python For Loops](https://www.geeksforgeeks.org/python/loops-in-python/)
+- [Python For Loops](https://www.geeksforgeeks.org/python/for-loops-in-python/)
 - [Python While Loop](https://www.geeksforgeeks.org/python/python-while-loop/)
-- [Python Break, Continue and Pass](https://www.geeksforgeeks.org/python/break-continue-and-pass-in-python/)
+- [Break, Continue and Pass](https://www.geeksforgeeks.org/python/break-continue-and-pass-in-python/)
