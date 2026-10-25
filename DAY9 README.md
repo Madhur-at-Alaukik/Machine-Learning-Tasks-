@@ -1,193 +1,132 @@
 # Machine Learning – Daily Task Update
 ## Module 3: Data Analysis and Feature Engineering
-## Day 9: NumPy Fundamentals
+## Day 9: NumPy — Working with Numerical Data
 
-### 1. What Is NumPy?
-NumPy (Numerical Python) is a Python library for efficient numerical computing. Its central data structure is the multidimensional `ndarray`, which stores elements in a regular array structure and supports vectorized operations, aggregation, and linear algebra.
+Python lists are fine for learning, but data analysis often requires calculations over many numerical values. NumPy provides efficient arrays and mathematical operations that make this work easier. It also underpins many scientific Python libraries.
 
-Install NumPy if required:
+### 1. Create your first array
+Install NumPy if needed, then import it using the conventional alias \`np\`.
 
-```bash
+\`\`\`bash
 python -m pip install numpy
-```
+\`\`\`
 
-Import it using the common alias:
-
-```python
-import numpy as np
-```
-
-### 2. Python Lists vs. NumPy Arrays
-Python lists can hold objects of different types. NumPy arrays are generally designed for efficient operations on homogeneous numerical data and offer vectorized computations.
-
-```python
-numbers = [1, 2, 3]
-array = np.array([1, 2, 3])
-
-print(numbers * 2)  # [1, 2, 3, 1, 2, 3]
-print(array * 2)    # [2 4 6]
-```
-
-Multiplying a list by 2 repeats its elements; multiplying a numeric NumPy array by 2 scales each element.
-
-### 3. Creating Arrays
-```python
+\`\`\`python
 import numpy as np
 
-a = np.array([1, 2, 3])
-b = np.array([[1, 2, 3], [4, 5, 6]])
+marks = np.array([78, 85, 91, 67])
+print(marks)
+print(type(marks))
+print(marks.shape)
+print(marks.dtype)
+\`\`\`
 
-print(a)
-print(b)
-print(np.zeros((2, 3)))
-print(np.ones((2, 2)))
-print(np.arange(0, 10, 2))
-print(np.linspace(0, 1, 5))
-```
+A NumPy array stores values in a structured, usually homogeneous data type. The \`shape\` tells you its dimensions, while \`dtype\` tells you the element type. These details matter when preparing arrays for ML libraries.
 
-- `array()` converts input data to an array.
-- `zeros()` creates an array filled with zeros.
-- `ones()` creates an array filled with ones.
-- `arange()` creates values with a specified step.
-- `linspace()` creates a specified number of evenly spaced values between endpoints.
+### 2. Build arrays in different shapes
+\`\`\`python
+zeros = np.zeros((2, 3))
+ones = np.ones((2, 2))
+sequence = np.arange(0, 10, 2)
+evenly_spaced = np.linspace(0, 1, 5)
 
-### 4. Dimensions, Shape, Size and Data Type
-- `ndim`: Number of dimensions.
-- `shape`: Length of each dimension.
-- `size`: Total number of elements.
-- `dtype`: Element data type.
+print(zeros)
+print(ones)
+print(sequence)       # [0 2 4 6 8]
+print(evenly_spaced)  # Five values from 0 to 1
+\`\`\`
 
-```python
-a = np.array([[1, 2, 3], [4, 5, 6]])
+- \`zeros()\` and \`ones()\` create arrays filled with a constant.
+- \`arange()\` creates values using a step size, excluding the stop value.
+- \`linspace()\` creates a specified number of evenly spaced values across an interval, including endpoints by default.
 
-print(a.ndim)   # 2
-print(a.shape)  # (2, 3)
-print(a.size)   # 6
-print(a.dtype)
-```
+### 3. Let arrays handle repeated calculations
+NumPy supports vectorized operations: apply an operation to an entire array without writing an explicit Python loop.
 
-The shape `(2, 3)` means two rows and three columns.
+\`\`\`python
+marks = np.array([60, 70, 80, 90])
+adjusted = marks + 5
+percentage = marks / 100
 
-### 5. Indexing and Slicing
-NumPy uses zero-based indexing. For a two-dimensional array, use one index per dimension.
+print(adjusted)
+print(percentage)
+print(np.mean(marks))
+print(np.max(marks))
+print(np.std(marks))
+\`\`\`
 
-```python
-a = np.array([[10, 20, 30], [40, 50, 60]])
+The original array is not changed by \`marks + 5\`; the expression creates a result. NumPy also provides \`sum\`, \`min\`, \`median\`, \`var\` and \`std\`.
 
-print(a[0, 1])   # 20
-print(a[1, :])   # [40 50 60]
-print(a[:, 0])   # [10 40]
-print(a[:, 1:3])
-```
+### 4. Select the values you need
+Indexing accesses an individual element; slicing selects a range. In a two-dimensional array, use a comma to separate row and column selection.
 
-Basic slices often produce views that share memory with the original array. Changing a view can therefore change the original array. Use `.copy()` when an independent copy is required.
+\`\`\`python
+data = np.array([
+    [10, 20, 30],
+    [40, 50, 60],
+    [70, 80, 90]
+])
 
-### 6. Reshaping Arrays
-`reshape()` changes the shape without changing the element count. The new shape must contain the same total number of elements.
+print(data[0, 1])   # 20
+print(data[1])      # Second row
+print(data[:, 0])   # First column
+print(data[:2, 1:]) # First two rows, columns 2 onward
+\`\`\`
 
-```python
-a = np.arange(1, 7)
-matrix = a.reshape(2, 3)
+NumPy slices often create **views** into the original array rather than independent copies. Changing a view can therefore change the original data. Use \`.copy()\` when you need a separate array.
 
-print(matrix)
-print(matrix.reshape(3, 2))
-```
+### 5. Filter using conditions
+Boolean indexing selects values that meet a condition.
 
-Using `reshape(-1, 1)` or `reshape(1, -1)` lets NumPy infer one dimension from the element count.
+\`\`\`python
+marks = np.array([35, 72, 41, 28, 90])
+passed = marks[marks >= 40]
+print(passed)  # [72 41 90]
+\`\`\`
 
-### 7. Vectorization
-Vectorization applies operations to whole arrays without writing an explicit Python loop for each element.
+Combine conditions with \`&\` and \`|\`, putting each condition in parentheses:
 
-```python
-values = np.array([10, 20, 30, 40])
-discounted = values * 0.9
-print(discounted)
-```
+\`\`\`python
+selected = marks[(marks >= 40) & (marks < 80)]
+print(selected)
+\`\`\`
 
-Vectorized operations are often faster and more concise than Python loops because numerical work can run in optimized compiled code.
+This is useful for selecting records that meet multiple criteria before further analysis.
 
-### 8. Broadcasting
-Broadcasting allows NumPy to perform operations on arrays with compatible shapes without manually copying smaller arrays.
+### 6. Understand dimensions and reshaping
+The number of dimensions is available through \`ndim\`, and the number of elements through \`size\`.
 
-For each dimension, sizes must either be equal or one of them must be 1; dimensions are compared from the right.
+\`\`\`python
+values = np.arange(12)
+matrix = values.reshape(3, 4)
 
-```python
-matrix = np.array([[1, 2, 3], [4, 5, 6]])
-row = np.array([10, 20, 30])
+print(matrix.shape)  # (3, 4)
+print(matrix.ndim)   # 2
+print(matrix.size)   # 12
+\`\`\`
 
-print(matrix + row)
-```
+A reshape must preserve the total number of elements. An array of 12 values can become a 3-by-4 matrix, but not a 5-by-3 matrix.
 
-The row vector is broadcast across both rows. Incompatible shapes raise an error.
+### 7. Broadcasting and matrix operations
+Broadcasting lets NumPy perform operations on compatible shapes without manually repeating every value. Adding a scalar to a matrix, for example, adds it to every element. More complex shapes are compatible when their dimensions match or one of them is 1, comparing from the right.
 
-### 9. Aggregation Functions
-NumPy provides functions for summaries and reductions:
-- `np.sum()`: Sum.
-- `np.mean()`: Mean.
-- `np.median()`: Median.
-- `np.min()` and `np.max()`: Minimum and maximum.
-- `np.std()` and `np.var()`: Standard deviation and variance.
-- `np.sum(array, axis=0)`: Reduce across rows, returning column totals.
-- `np.sum(array, axis=1)`: Reduce across columns, returning row totals.
+For linear algebra, \`@\` performs matrix multiplication:
 
-```python
-data = np.array([[10, 20, 30], [40, 50, 60]])
-
-print(np.mean(data))
-print(np.sum(data, axis=0))  # Column totals
-print(np.sum(data, axis=1))  # Row totals
-```
-
-By default, NumPy's variance and standard deviation functions use population normalization (`ddof=0`). Set `ddof=1` for the common sample estimate when appropriate.
-
-### 10. Random Number Generation
-NumPy provides random sampling for simulations, test data, and reproducible experiments.
-
-```python
-rng = np.random.default_rng(42)
-
-print(rng.integers(1, 7, size=5))
-print(rng.random(3))
-print(rng.normal(loc=0, scale=1, size=4))
-```
-
-A fixed seed makes results reproducible for the same generator and compatible environment. Random data generated this way is useful for learning, not for security-sensitive randomness.
-
-### 11. Basic Linear Algebra
-```python
+\`\`\`python
 A = np.array([[1, 2], [3, 4]])
 B = np.array([[5, 6], [7, 8]])
+print(A @ B)
+\`\`\`
 
-print(A + B)       # Element-wise addition
-print(A @ B)       # Matrix multiplication
-print(A.T)         # Transpose
-print(np.linalg.det(A))
-print(np.linalg.norm(np.array([3, 4])))
-```
+Do not confuse \`A * B\`, which multiplies corresponding elements, with \`A @ B\`, which performs matrix multiplication.
 
-The `numpy.linalg` module provides linear algebra operations, including determinants, norms, solving linear systems, and decompositions.
+### Practice task
+Create an array of marks for ten students. Calculate the mean and standard deviation, select the marks above the mean and reshape the values into a suitable matrix. Check the shape and data type at each step.
 
-### 12. Practical Exercises
-1. Create 1D, 2D, and 3D arrays and inspect their shapes.
-2. Select specific rows, columns, and slices.
-3. Reshape a one-dimensional array into a matrix.
-4. Compare a loop-based calculation with a vectorized calculation.
-5. Demonstrate broadcasting between a matrix and a row vector.
-6. Calculate mean, standard deviation, and totals along each axis.
-7. Perform matrix multiplication and calculate vector distance.
+**Practical objective:** Create, inspect, slice, filter and transform NumPy arrays, and understand the difference between element-wise operations and matrix multiplication.
 
-### 13. Key Takeaways
-- NumPy provides efficient multidimensional numerical arrays.
-- `shape`, `ndim`, `size`, and `dtype` describe array structure.
-- Indexing and slicing select array elements; slices may share memory.
-- Reshaping changes dimensions without changing the element count.
-- Vectorization and broadcasting simplify numerical operations.
-- Aggregation functions summarize data, and `numpy.linalg` supports linear algebra.
-
-**Practical Objective:** Create, inspect, transform, summarize, and calculate with NumPy arrays, preparing for data manipulation and ML algorithms.
-
-**GeeksforGeeks References:**
+**GeeksforGeeks references**
 - [NumPy Tutorial](https://www.geeksforgeeks.org/python/numpy-tutorial/)
 - [NumPy Array](https://www.geeksforgeeks.org/python/numpy-ndarray/)
+- [NumPy Indexing and Slicing](https://www.geeksforgeeks.org/python/numpy-indexing/)
 - [NumPy Broadcasting](https://www.geeksforgeeks.org/python/numpy-broadcasting/)
-- [NumPy Random](https://www.geeksforgeeks.org/python/numpy-random/)
