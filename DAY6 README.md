@@ -1,174 +1,95 @@
 # Machine Learning – Daily Task Update
 ## Module 2: Mathematics and Statistics
-## Day 6: Descriptive Statistics and Distributions
+## Day 6: Understanding Data with Descriptive Statistics
 
-### 1. Population, Sample and Sampling Bias
-A **population** is the complete group we want to understand. A **sample** is a subset selected from that population. We often study a sample because collecting data from every member of a population is expensive or impractical.
+Before building a model, take time to understand the data it will learn from. Descriptive statistics give us a compact view of what is typical, how much values vary and whether a dataset contains unusual observations.
 
-**Example:** All customers of a company form the population; 500 surveyed customers form a sample.
+### 1. First, know which data you have
+A **population** is the full group we want to understand. A **sample** is the subset we actually observe. If we want to understand the marks of every student in a college, all students form the population; a selected group forms a sample.
 
-A sample should represent the population. **Sampling bias** occurs when the selection method systematically favors some members or outcomes, making conclusions less reliable.
+Data can also be described by its type:
+- **Numerical:** values such as age, salary or temperature.
+- **Categorical:** groups such as department, city or product type.
+- **Discrete:** countable numerical values, such as number of visits.
+- **Continuous:** measurements that can take values across a range, such as height.
 
-**Example:** Surveying only premium customers to estimate satisfaction among all customers can produce a biased estimate.
+The data type affects which summaries and charts make sense.
 
-### 2. Mean, Median and Mode
-**Mean:** The arithmetic average; add all values and divide by the number of values.
+### 2. Describe the centre of a dataset
+The **mean** is the arithmetic average: add the values and divide by the number of values.
 
-`Mean = Sum of values / Number of values`
+\`\`\`python
+values = [10, 12, 12, 14, 42]
+mean_value = sum(values) / len(values)
+print(mean_value)
+\`\`\`
 
-**Median:** The middle value after sorting the data. For an even number of observations, it is the average of the two middle values.
+The **median** is the middle value after sorting the data. With an even number of observations, it is the average of the two middle values. The **mode** is the most frequently occurring value.
 
-**Mode:** The most frequent value. A dataset may have one mode, multiple modes, or no uniquely most frequent value.
+The mean is useful but can be pulled by unusually high or low observations. The median is often a better description of the centre when the distribution is strongly skewed. The mode is especially helpful for categorical data or repeated values.
 
-Example dataset: `2, 3, 3, 4, 18`
-- Mean = 6
-- Median = 3
-- Mode = 3
+### 3. Measure how spread out values are
+Two datasets can have the same mean but very different levels of variation.
 
-The large value 18 pulls the mean upward, while the median is more resistant to extreme observations.
+- **Range:** maximum minus minimum.
+- **Variance:** average squared distance from the mean (the denominator depends on whether we describe a population or estimate from a sample).
+- **Standard deviation:** square root of variance, expressed in the same units as the original data.
+- **Interquartile range (IQR):** third quartile minus first quartile; it describes the spread of the middle half of the observations.
 
-### 3. Range, Variance and Standard Deviation
-**Range** is the difference between the largest and smallest values.
+For a population, variance is commonly written as:
 
-`Range = Maximum − Minimum`
+\[
+\sigma^2 = \frac{1}{N}\sum_{i=1}^{N}(x_i-\mu)^2
+\]
 
-**Variance** measures the average squared deviation from the mean. Population variance divides by `N`; sample variance commonly divides by `n - 1` to estimate population variance.
+Here, \(x_i\) is an observation, \(\mu\) is the population mean and \(N\) is the population size. Sample variance typically uses \(n-1\) in the denominator when estimating population variance from a sample.
 
-Population variance: `σ² = Σ(xᵢ − μ)² / N`
+### 4. Look at the shape, not just the average
+A distribution describes how values are spread across possible outcomes.
 
-Sample variance: `s² = Σ(xᵢ − x̄)² / (n − 1)`
+- **Symmetric distribution:** the two sides have a similar shape.
+- **Right-skewed distribution:** a longer tail extends toward larger values; income data often show this pattern.
+- **Left-skewed distribution:** a longer tail extends toward smaller values.
+- **Uniform distribution:** outcomes have roughly equal probability across a defined range.
+- **Normal distribution:** a symmetric, bell-shaped distribution described by its mean and standard deviation.
 
-**Standard deviation** is the square root of variance. It measures spread in the same units as the original data.
+Real data do not have to follow a normal distribution. Do not assume they do simply because a textbook example uses a bell curve.
 
-A high standard deviation indicates more spread around the mean, but interpretation depends on the distribution and context.
+### 5. Percentiles and possible outliers
+A percentile indicates the point below which a given percentage of observations falls. The median is the 50th percentile; the first and third quartiles correspond to the 25th and 75th percentiles.
 
-### 4. Quartiles, Percentiles and IQR
-Quartiles divide sorted data into four parts:
-- Q1: approximately the 25th percentile.
-- Q2: the median, or 50th percentile.
-- Q3: approximately the 75th percentile.
+A common rule for flagging possible outliers uses the IQR:
+- Lower fence: \(Q_1 - 1.5 \times IQR\)
+- Upper fence: \(Q_3 + 1.5 \times IQR\)
 
-A percentile describes the position below which a given percentage of observations falls. Exact percentile calculations can differ slightly between software methods.
+Values beyond these fences are worth investigating, but they are not automatically errors. A large value may be genuine and important.
 
-**Interquartile range (IQR):**
+### 6. Calculate summaries with Python
+\`\`\`python
+import statistics
 
-`IQR = Q3 − Q1`
+values = [10, 12, 12, 14, 42]
 
-IQR measures the spread of the middle 50% of the data and is relatively resistant to extreme values.
+print("Mean:", statistics.mean(values))
+print("Median:", statistics.median(values))
+print("Population standard deviation:", statistics.pstdev(values))
+print("Sample standard deviation:", statistics.stdev(values))
+\`\`\`
 
-### 5. Outliers
-An outlier is an observation unusually far from the general pattern of the data. Outliers may reflect data-entry errors, measurement issues, rare valid events, or a different population.
+For a real dataset, Pandas can provide a quick overview with \`df.describe()\`. NumPy also makes numerical calculations over arrays convenient.
 
-A common IQR rule flags values below `Q1 − 1.5 × IQR` or above `Q3 + 1.5 × IQR`.
+### 7. Why these summaries matter for ML
+Descriptive statistics can reveal inconsistent ranges, skewed variables, unexpected categories and possible data-entry errors. They help us choose useful visualizations and decide whether a transformation might be worth testing.
 
-This rule identifies potential outliers, not automatically incorrect values. Investigate them before removing or changing them.
+Statistics alone cannot tell us whether a feature is meaningful or whether one variable causes another. Use the summaries to form questions, then investigate the data and its context.
 
-### 6. Common Distributions
-**Normal distribution:** A symmetric, bell-shaped distribution described by its mean and standard deviation. In an ideal normal distribution, the mean, median, and mode are equal.
+### Practice task
+Use a small list of marks or salaries. Calculate the mean, median, range and standard deviation. Add one unusually large value and observe which summaries change the most. Explain why the mean and median tell different stories in that example.
 
-**Uniform distribution:** Values within a specified interval have equal density (for a continuous uniform distribution).
+**Practical objective:** Summarize a dataset's centre, spread and distribution shape, and recognize observations that deserve a closer look.
 
-**Skewed distribution:** An asymmetric distribution.
-- **Right-skewed:** A longer tail extends toward larger values.
-- **Left-skewed:** A longer tail extends toward smaller values.
-
-Income and transaction amounts are often right-skewed, though real data may have other shapes.
-
-### 7. Z-Scores
-A z-score expresses how many standard deviations an observation is from the mean.
-
-`z = (x − μ) / σ`
-
-For sample-based analysis, the sample mean and sample standard deviation are often substituted.
-
-- `z = 0`: At the mean.
-- `z = 1`: One standard deviation above the mean.
-- `z = -2`: Two standard deviations below the mean.
-
-Z-scores help compare values on different scales, but they do not automatically prove that an observation is an outlier.
-
-### 8. Calculate Statistics with Python
-```python
-import statistics as stats
-
-data = [2, 3, 3, 4, 18]
-
-print("Mean:", stats.mean(data))
-print("Median:", stats.median(data))
-print("Mode:", stats.mode(data))
-print("Sample variance:", stats.variance(data))
-print("Sample standard deviation:", stats.stdev(data))
-print("Range:", max(data) - min(data))
-```
-
-The variance and standard deviation functions above use sample formulas. The dataset is small, so the output should be interpreted as a description of these observations rather than a strong conclusion about a larger population.
-
-### 9. Identify Potential Outliers Using IQR
-```python
-import numpy as np
-
-data = np.array([10, 12, 13, 14, 15, 16, 18, 80])
-
-q1 = np.percentile(data, 25)
-q3 = np.percentile(data, 75)
-iqr = q3 - q1
-
-lower_bound = q1 - 1.5 * iqr
-upper_bound = q3 + 1.5 * iqr
-
-outliers = data[(data < lower_bound) | (data > upper_bound)]
-
-print("Q1:", q1)
-print("Q3:", q3)
-print("IQR:", iqr)
-print("Potential outliers:", outliers)
-```
-
-Quartile interpolation conventions may vary between tools. The IQR method should be used as a diagnostic aid, not an automatic data-cleaning rule.
-
-### 10. Visualize a Distribution
-```python
-import matplotlib.pyplot as plt
-
-data = [10, 12, 13, 14, 15, 16, 18, 80]
-
-plt.hist(data, bins=5, edgecolor="black")
-plt.title("Distribution of Values")
-plt.xlabel("Value")
-plt.ylabel("Frequency")
-plt.show()
-
-plt.boxplot(data)
-plt.title("Box Plot of Values")
-plt.ylabel("Value")
-plt.show()
-```
-
-A histogram shows how observations are distributed across intervals. A box plot summarizes the median, quartiles, and potential outliers according to its plotting convention.
-
-### 11. Comparing Two Datasets
-When comparing datasets, inspect:
-- Center: mean and median.
-- Spread: range, variance, standard deviation, and IQR.
-- Shape: symmetry, skewness, and multiple peaks.
-- Unusual values: possible outliers or data errors.
-- Sample size and data collection method.
-
-Two datasets can have the same mean but very different spreads and distributions.
-
-### 12. Key Takeaways
-- A sample should represent the population to support reliable conclusions.
-- Mean is sensitive to extreme values; median is more robust.
-- Variance measures squared spread, while standard deviation uses the original units.
-- Quartiles and IQR describe the middle of the distribution.
-- The IQR rule flags potential outliers that need investigation.
-- Z-scores describe distance from the mean in standard deviation units.
-- Histograms and box plots complement numerical summaries.
-
-**Practical Objective:** Calculate and interpret descriptive statistics, identify potential outliers, and describe distribution shape using numerical summaries and plots.
-
-**GeeksforGeeks References:**
+**GeeksforGeeks references**
 - [Measures of Central Tendency](https://www.geeksforgeeks.org/maths/measures-of-central-tendency/)
-- [Variance and Standard Deviation](https://www.geeksforgeeks.org/maths/variance/)
+- [Measures of Dispersion](https://www.geeksforgeeks.org/maths/measures-of-dispersion/)
 - [Normal Distribution](https://www.geeksforgeeks.org/maths/normal-distribution/)
-- [Z-Score](https://www.geeksforgeeks.org/maths/z-score/)
+- [Statistics in Python](https://www.geeksforgeeks.org/python/statistics-functions-in-python/)
