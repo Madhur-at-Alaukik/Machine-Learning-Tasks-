@@ -1,233 +1,111 @@
 # Machine Learning – Daily Task Update
-## Day 2: Python Variables, Data Types and Operators
+## Day 2: Python Basics — Values, Variables and Expressions
 
-### 1. Python Syntax, Indentation and Comments
-Python syntax is the set of rules used to write valid Python code. Python uses indentation (spaces at the beginning of a line) to define blocks of code, such as the body of a function or conditional statement.
+Before working with datasets, we need to be comfortable storing information, changing it and checking the results. Today's examples use small values, but the same ideas later help us work with thousands of rows of data.
 
-```python
-# This is a single-line comment
-marks = 80
+### 1. Write a small Python program
+Python code is usually read from top to bottom. Indentation is meaningful: it shows which statements belong together, especially inside conditions, loops and functions. Use consistent four-space indentation.
 
-if marks >= 40:
-    print("Pass")
-```
+\`\`\`python
+# A comment explains the code to a reader.
+name = "Asha"
+marks = 86
+print(f"{name} scored {marks} marks.")
+\`\`\`
 
-The indented `print()` line belongs to the `if` block. Inconsistent indentation can cause an `IndentationError`.
+A comment begins with \`#\`. Comments are most useful when they explain intent or a non-obvious decision rather than repeat every line in English.
 
-Comments begin with `#` and help explain code. Python ignores comments during normal execution.
+### 2. Variables are names for values
+A variable gives a value a useful name so we can reuse it.
 
-### 2. Variables
-A variable is a name that refers to a value or object. Variables let us store and reuse information.
-
-```python
-student_name = "Aarav"
-age = 21
-percentage = 82.5
+\`\`\`python
+student_name = "Ravi"
+age = 20
+attendance = 0.92
 is_enrolled = True
-```
+print(student_name, age, attendance, is_enrolled)
+\`\`\`
 
-**Naming rules:**
-- Names can contain letters, digits, and underscores.
-- A name cannot begin with a digit.
-- Names are case-sensitive: `marks` and `Marks` are different.
-- Python keywords such as `if`, `for`, and `class` cannot be used as variable names.
-- Use meaningful `snake_case` names, such as `total_marks`.
+Python infers the type from the assigned value. Variable names are case-sensitive, cannot begin with a digit and should describe what the value represents. \`total_marks\` is usually clearer than \`tm\`.
 
-Python is dynamically typed, meaning the type is associated with the value and a variable can later refer to a value of another type.
+### 3. Meet the basic data types
+| Type | What it represents | Example |
+|---|---|---|
+| \`int\` | Whole numbers | \`42\` |
+| \`float\` | Numbers with a decimal part | \`3.14\` |
+| \`str\` | Text | \`"Machine Learning"\` |
+| \`bool\` | True/false values | \`True\` |
+| \`NoneType\` | Absence of a value | \`None\` |
 
-### 3. Basic Python Data Types
-**Integer (`int`):** Whole numbers, such as `10`, `-4`, and `0`.
+Check a value's type with \`type()\`:
 
-**Floating-point (`float`):** Numbers with a fractional part, such as `3.14` or `-0.5`.
+\`\`\`python
+price = 99.5
+print(type(price))  # <class 'float'>
+\`\`\`
 
-**String (`str`):** Text enclosed in single or double quotes, such as `"Python"`.
+You will also meet collections such as lists and dictionaries in later lessons. They are useful when one variable needs to hold multiple values or named pieces of information.
 
-**Boolean (`bool`):** Logical values `True` and `False`.
+### 4. Get input and convert it
+The \`input()\` function reads text from the user. Even if someone types a number, the result is a string until we convert it.
 
-```python
-age = 21
-height = 1.72
-name = "Riya"
-is_student = True
+\`\`\`python
+first = float(input("Enter the first number: "))
+second = float(input("Enter the second number: "))
+print("Sum:", first + second)
+\`\`\`
 
-print(type(age))
-print(type(height))
-print(type(name))
-print(type(is_student))
-```
+Use \`int()\` for whole-number input and \`float()\` when decimal values are possible. Conversion can fail if the input is not a valid number, so robust programs should handle that possibility.
 
-`type()` reports the type of an object. In ML work, correct data types matter because calculations and transformations depend on them.
+### 5. Operators let values work together
+Arithmetic operators perform calculations:
 
-### 4. Type Conversion
-Type conversion changes a value from one type to another when the conversion is valid.
+\`\`\`python
+a, b = 17, 5
+print(a + b)   # 22
+print(a - b)   # 12
+print(a * b)   # 85
+print(a / b)   # 3.4
+print(a // b)  # 3: floor division
+print(a % b)   # 2: remainder
+print(a ** b)  # 1419857
+\`\`\`
 
-```python
-age_text = "21"
-age_number = int(age_text)
+Comparison operators such as \`==\`, \`!=\`, \`>\`, \`<\`, \`>=\` and \`<=\` return a Boolean result. Logical operators \`and\`, \`or\` and \`not\` combine Boolean expressions.
 
-price_text = "149.50"
-price = float(price_text)
-
-marks = 85
-marks_text = str(marks)
-
-print(age_number + 1)  # 22
-print(price)           # 149.5
-print(marks_text)      # 85
-```
-
-`int()`, `float()`, `str()`, and `bool()` are common conversion functions. Invalid conversions can raise errors; for example, `int("hello")` raises a `ValueError`.
-
-**Important:** `input()` returns text (`str`). Convert it when numerical operations are required.
-
-### 5. Input and Output
-`input()` reads text from the user. `print()` displays information.
-
-```python
-name = input("Enter your name: ")
-age = int(input("Enter your age: "))
-
-print("Name:", name)
-print("Next year, you will be", age + 1)
-```
-
-If the user enters `20`, the age is converted to the integer `20` before addition.
-
-### 6. Arithmetic Operators
-Arithmetic operators perform mathematical calculations.
-
-| Operator | Meaning | Example | Result |
-|---|---|---|---|
-| `+` | Addition | `8 + 3` | `11` |
-| `-` | Subtraction | `8 - 3` | `5` |
-| `*` | Multiplication | `8 * 3` | `24` |
-| `/` | Division | `8 / 3` | `2.666...` |
-| `//` | Floor division | `8 // 3` | `2` |
-| `%` | Remainder | `8 % 3` | `2` |
-| `**` | Exponentiation | `2 ** 3` | `8` |
-
-Division by zero raises `ZeroDivisionError`. Floor division rounds down to the next integer when both operands are integers; for negative values, “down” means toward negative infinity.
-
-### 7. Comparison Operators
-Comparison operators compare values and return a Boolean result.
-
-| Operator | Meaning |
-|---|---|
-| `==` | Equal to |
-| `!=` | Not equal to |
-| `>` | Greater than |
-| `<` | Less than |
-| `>=` | Greater than or equal to |
-| `<=` | Less than or equal to |
-
-```python
-marks = 75
+\`\`\`python
+marks = 72
+attendance = 0.82
 print(marks >= 40)  # True
-print(marks == 100) # False
-```
+print(marks >= 40 and attendance >= 0.75)
+\`\`\`
 
-**`=` vs. `==`:** `=` assigns a value to a variable; `==` checks whether two values are equal.
+Assignment operators such as \`=\`, \`+=\` and \`-=\` store or update a variable's value. Do not confuse \`=\` (assignment) with \`==\` (comparison).
 
-### 8. Logical Operators
-Logical operators combine or reverse Boolean expressions.
-- `and`: True when both conditions are true.
-- `or`: True when at least one condition is true.
-- `not`: Reverses a Boolean result.
+### 6. Make output easier to read
+An f-string lets you place variable values inside a string by writing \`f\` before the opening quote.
 
-```python
-age = 22
-has_id = True
+\`\`\`python
+name = "Mina"
+score = 91.456
+print(f"{name}'s score is {score:.2f}.")
+\`\`\`
 
-print(age >= 18 and has_id)  # True
-print(age < 18 or has_id)    # True
-print(not has_id)            # False
-```
+The format \`:.2f\` displays two digits after the decimal point. Clear output helps when checking results or presenting analysis.
 
-### 9. Assignment Operators
-Assignment operators store or update values.
+### 7. A few useful habits
+- Choose names that explain what a value means.
+- Convert input to the required type before doing calculations.
+- Use parentheses when an expression becomes difficult to read.
+- Add comments where they explain a decision or a tricky step.
+- Test small examples before combining everything into a larger program.
 
-```python
-count = 10
-count += 2   # count = count + 2
-count -= 1
-count *= 3
-print(count)  # 33
-```
+### Practice task
+Write a marks calculator that asks for a student's name and marks in three subjects. Convert the marks to numbers, calculate the total and average, and display a sentence using an f-string. Try decimal marks too, and check that the output is readable.
 
-Other augmented operators include `/=`, `//=`, `%=`, and `**=`.
+**Practical objective:** Store values, identify common data types, accept input, perform calculations and format output.
 
-### 10. Operator Precedence
-Python follows precedence rules to decide which operations happen first. Parentheses can make the intended order clearer.
-
-```python
-result1 = 2 + 3 * 4       # 14
-result2 = (2 + 3) * 4     # 20
-```
-
-Multiplication is performed before addition in the first expression. Use parentheses when they improve readability.
-
-### 11. F-Strings
-F-strings insert values or expressions directly into a string using curly braces.
-
-```python
-name = "Aarav"
-marks = 87.456
-
-print(f"{name} scored {marks:.2f}%")
-```
-
-Output:
-
-```text
-Aarav scored 87.46%
-```
-
-The format specifier `.2f` displays two digits after the decimal point.
-
-### 12. Practical Programs
-**A. Percentage calculator**
-
-```python
-obtained = float(input("Enter marks obtained: "))
-maximum = float(input("Enter maximum marks: "))
-
-if maximum > 0:
-    percentage = obtained / maximum * 100
-    print(f"Percentage: {percentage:.2f}%")
-else:
-    print("Maximum marks must be greater than zero.")
-```
-
-**B. Simple-interest calculator**
-
-```python
-principal = float(input("Principal amount: "))
-rate = float(input("Annual rate (%): "))
-time = float(input("Time in years: "))
-
-simple_interest = principal * rate * time / 100
-print(f"Simple interest: {simple_interest:.2f}")
-```
-
-**C. Celsius to Fahrenheit**
-
-```python
-celsius = float(input("Temperature in Celsius: "))
-fahrenheit = (celsius * 9 / 5) + 32
-print(f"Temperature in Fahrenheit: {fahrenheit:.2f}")
-```
-
-### 13. Key Takeaways
-- Variables store references to values, and meaningful names improve readability.
-- Common basic types include `int`, `float`, `str`, and `bool`.
-- `input()` returns a string, so convert user input before numeric calculations.
-- `=` assigns a value, while `==` compares values.
-- Arithmetic, comparison, logical, and assignment operators support calculations and decision-making.
-- F-strings make output formatting readable.
-
-**Practical Objective:** Write small Python programs that accept input, convert types, perform calculations, compare values, and display formatted results.
-
-**GeeksforGeeks References:**
+**GeeksforGeeks references**
 - [Python Variables](https://www.geeksforgeeks.org/python/python-variables/)
 - [Python Data Types](https://www.geeksforgeeks.org/python/python-data-types/)
 - [Python Operators](https://www.geeksforgeeks.org/python/python-operators/)
