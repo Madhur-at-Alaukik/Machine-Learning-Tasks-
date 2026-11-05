@@ -183,3 +183,34 @@ A safer process is:
 4. Keep the test data out of decisions that fit or select preprocessing steps.
 
 The same rule applies to operations such as scaling, feature selection and transformations that learn statistics from the dataset. In Scikit-learn, a Pipeline can help keep preprocessing and model training together so that transformations are fitted correctly within training workflows.
+
+
+## Additional Learning — Applying Cleaning Checks to the Loan Approval Dataset
+
+The cleaning concepts were also applied to the Loan Approval Prediction dataset, which contains 13 columns, including applicant details, financial information and the `loan_status` target.
+
+The initial missing-value check showed **0 missing values in all 13 columns**. This means missing-value imputation was not required based on that check.
+
+```python
+# Check missing values in every column
+print(df.isnull().sum())
+
+# Remove extra spaces from column names
+df.columns = df.columns.str.strip()
+
+# Check duplicate rows
+print(df.duplicated().sum())
+```
+
+A further check is to inspect numerical ranges rather than assuming every numeric value is valid. For example, CIBIL scores are commonly expected to fall within the 300–900 range, so values outside that range can be flagged for review.
+
+```python
+# Find CIBIL scores outside the expected range
+invalid_scores = df[
+    ~df["cibil_score"].between(300, 900)
+]
+
+print(invalid_scores)
+```
+
+Potential outliers in income, loan amount and asset values can also be flagged with the IQR method. These observations should be investigated before changing or removing them. A high financial value may be valid and should not be treated as an error only because it is unusual.
