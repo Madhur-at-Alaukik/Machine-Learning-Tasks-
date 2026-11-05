@@ -153,3 +153,46 @@ Target encoding should be calculated using training folds only. Out-of-fold enco
 A model trained on imbalanced data may favour the majority class and perform poorly on the minority class. High overall accuracy can hide this problem.
 
 The class distribution should be inspected before training. Evaluation should consider precision, recall and F1-score for each class, along with the confusion matrix. The appropriate approach depends on the problem and the cost of different prediction errors.
+
+
+## Additional Learning — Preparing Loan Dataset Features for a Model
+
+The Loan Approval Prediction dataset was used to practise preparing input features and a target before model training.
+
+The `loan_status` column is the target because it contains the decision to be predicted. The `loan_id` column identifies each record, so it was excluded from the input features.
+
+```python
+X = df.drop(columns=["loan_id", "loan_status"])
+y = df["loan_status"]
+```
+
+The dataset contains categorical features such as `education` and `self_employed`. These values need to be represented numerically for algorithms such as Logistic Regression. One-hot encoding creates separate indicator columns for the categories without assigning them an artificial ranking.
+
+```python
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.compose import ColumnTransformer
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.2,
+    random_state=42,
+    stratify=y
+)
+
+cat_features = ["education", "self_employed"]
+num_features = [col for col in X.columns if col not in cat_features]
+
+preprocessor = ColumnTransformer(
+    transformers=[
+        ("cat", OneHotEncoder(handle_unknown="ignore"), cat_features),
+        ("num", "passthrough", num_features)
+    ]
+)
+
+X_train_encoded = preprocessor.fit_transform(X_train)
+X_test_encoded = preprocessor.transform(X_test)
+```
+
+The `stratify=y` option helps preserve the target-class proportions in the training and test sets. The encoder is fitted on training data using `fit_transform()`, and the same fitted encoder is applied to test data using `transform()`. This prevents test-set category information from influencing the fitted encoder.
