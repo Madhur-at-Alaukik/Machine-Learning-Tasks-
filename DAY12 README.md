@@ -1,231 +1,161 @@
 # Machine Learning – Daily Task Update
-## Module 3: Data Analysis and Feature Engineering
-## Day 12: Preparing a Loan Approval Dataset for Machine Learning
+## Day 12: Data Visualization
 
-For Day 12, I worked with a Loan Approval Prediction dataset. The dataset contains applicant and financial details that can be used to predict the loan decision. The target column is `loan_status`.
+### 1. Matplotlib and Seaborn
 
-### 1. Load and inspect the dataset
+**Data visualization** represents data using charts and plots so that distributions, comparisons, patterns and relationships can be examined.
+
+**Matplotlib** is a general-purpose Python plotting library. It provides control over figures, axes, labels, titles, legends, ticks and plot appearance. It is useful when a chart needs detailed customization.
+
+**Seaborn** is built on Matplotlib and provides a higher-level interface for statistical visualization. It works naturally with Pandas DataFrames and makes it easier to create charts such as distribution plots, categorical comparisons and correlation heatmaps.
 
 ```python
-import pandas as pd
-import numpy as np
-
-df = pd.read_csv("loan_approval_dataset.csv")
-
-# Remove extra spaces from column names
-df.columns = df.columns.str.strip()
-
-print(df.head())
-print(df.shape)
-print(df.info())
-print(df.isnull().sum())
+import matplotlib.pyplot as plt
+import seaborn as sns
 ```
 
-The dataset columns include:
+Both libraries can be used together. Seaborn creates the statistical chart, while Matplotlib can be used to adjust labels, titles, figure size and other display details.
 
-- `loan_id`
-- `no_of_dependents`
-- `education`
-- `self_employed`
-- `income_annum`
-- `loan_amount`
-- `loan_term`
-- `cibil_score`
-- `residential_assets_value`
-- `commercial_assets_value`
-- `luxury_assets_value`
-- `bank_asset_value`
-- `loan_status`
+### 2. Bar, Line and Area Charts
 
-The missing-value check showed zero missing values in all 13 columns, so no missing-value imputation was required at that point.
-
-### 2. Check duplicate records
+**Bar chart:** Uses rectangular bars to compare values across categories. The length or height of a bar represents the value for that category. Bar charts are suitable for comparing quantities such as sales by region or number of applications by status.
 
 ```python
-print(df.duplicated().sum())
-
-df = df.drop_duplicates()
-
-print(df["loan_id"].duplicated().sum())
+sns.barplot(data=df, x="education", y="income")
+plt.xlabel("Education")
+plt.ylabel("Average Income")
+plt.show()
 ```
 
-The first check finds exact duplicate rows. The second checks whether the loan identifier is repeated. These checks are useful because duplicate observations can affect analysis and model training.
+When comparing categories, use clear labels and a consistent scale. A bar chart normally uses a zero baseline because differences in bar length are interpreted visually.
 
-### 3. Check and correct data types
+**Line chart:** Connects data points in a meaningful order. It is commonly used to show how a numerical value changes over time, such as monthly revenue or daily temperature. The order of points matters; a line chart is not usually appropriate for unrelated categories.
 
 ```python
-print(df.dtypes)
-
-num_cols = [
-    "no_of_dependents",
-    "income_annum",
-    "loan_amount",
-    "loan_term",
-    "cibil_score",
-    "residential_assets_value",
-    "commercial_assets_value",
-    "luxury_assets_value",
-    "bank_asset_value"
-]
-
-for col in num_cols:
-    df[col] = pd.to_numeric(df[col], errors="coerce")
-
-print(df[num_cols].dtypes)
-print(df.isnull().sum())
+plt.plot(df["month"], df["sales"])
+plt.xlabel("Month")
+plt.ylabel("Sales")
+plt.show()
 ```
 
-This checks that numerical fields are stored as numbers. If an invalid value is found, `errors="coerce"` converts it to a missing value, which should then be investigated.
+**Area chart:** Similar to a line chart, but the area between the line and the baseline is filled. It emphasizes the magnitude of a value over an ordered sequence. Stacked area charts can show how several components contribute to a total over time, but overlapping areas can make exact comparisons difficult.
 
-### 4. Check categorical values
+### 3. Histograms and Density Plots
+
+**Histogram:** Shows the distribution of a numerical variable by dividing its values into intervals called bins. The height of each bar represents the number or proportion of observations within a bin.
+
+A histogram helps examine the centre, spread, skewness, gaps, peaks and possible extreme values in a numerical column.
 
 ```python
-cat_cols = ["education", "self_employed", "loan_status"]
-
-for col in cat_cols:
-    print(col)
-    print(df[col].value_counts(dropna=False))
+sns.histplot(data=df, x="income", bins=20)
+plt.xlabel("Annual Income")
+plt.show()
 ```
 
-This helps identify inconsistent labels, extra spaces or unexpected categories.
+The selected bin width affects the appearance of the distribution. Too few bins can hide useful detail, while too many can make random variation look like a pattern.
+
+**Density plot:** Shows a smoothed estimate of the distribution of a numerical variable. It provides a continuous curve rather than separate bars.
 
 ```python
-for col in cat_cols:
-    df[col] = df[col].astype("string").str.strip()
-
-print(df["education"].value_counts())
-print(df["self_employed"].value_counts())
-print(df["loan_status"].value_counts())
+sns.kdeplot(data=df, x="income", fill=True)
+plt.xlabel("Annual Income")
+plt.show()
 ```
 
-Removing surrounding spaces standardizes values without changing their meaning.
+Density plots are useful for comparing distribution shapes, but the smoothing bandwidth affects the curve. A density value represents estimated concentration, not the number of observations at an exact value.
 
-### 5. Inspect numerical values and potential outliers
+### 4. Scatter Plots
+
+A **scatter plot** displays pairs of numerical observations as points. One variable is placed on the horizontal axis and another on the vertical axis.
+
+It helps examine:
+- Whether two variables appear to move together.
+- Whether the relationship is positive, negative or weak.
+- Whether the relationship is linear or curved.
+- Whether clusters or unusual observations are present.
 
 ```python
-print(df[num_cols].describe())
-
-print(df[df["income_annum"] < 0])
-print(df[df["loan_amount"] < 0])
-print(df[~df["cibil_score"].between(300, 900)])
+sns.scatterplot(data=df, x="income_annum", y="loan_amount")
+plt.xlabel("Annual Income")
+plt.ylabel("Loan Amount")
+plt.show()
 ```
 
-These checks help find values that may be invalid. The CIBIL score check flags values outside the commonly used 300–900 range; flagged records should be checked against the dataset documentation.
+A scatter plot can reveal association, but it does not establish that one variable causes a change in another. Overlapping points may also hide how many observations share similar values.
 
-Potential outliers can also be found with the IQR method:
+### 5. Box and Violin Plots
+
+**Box plot:** Summarizes a numerical distribution using quartiles. The box extends from Q1 to Q3, and the line inside it marks the median. The interquartile range is the distance between Q1 and Q3. Whiskers extend according to the plotting method, and individual points beyond them may be displayed as potential outliers.
 
 ```python
-for col in num_cols:
-    q1 = df[col].quantile(0.25)
-    q3 = df[col].quantile(0.75)
-    iqr = q3 - q1
-
-    lower = q1 - 1.5 * iqr
-    upper = q3 + 1.5 * iqr
-
-    count = ((df[col] < lower) | (df[col] > upper)).sum()
-
-    print(col, "Potential outliers:", count)
+sns.boxplot(data=df, x="loan_status", y="loan_amount")
+plt.show()
 ```
 
-Outliers were inspected rather than automatically deleted. High income, large loans or high asset values may be genuine observations.
+Box plots are useful for comparing the centre and spread of a numerical variable across categories. They do not show every detail of the distribution, such as multiple peaks.
 
-### 6. Separate features and target
-
-The model should learn from applicant information and predict the loan decision.
-
-- **Features (`X`):** Input columns used to make a prediction.
-- **Target (`y`):** The column the model is expected to predict.
-
-The loan ID is an identifier, so it is not used as a predictive feature.
+**Violin plot:** Combines a box-plot-style summary with a density shape. The width of the violin indicates where observations are more concentrated.
 
 ```python
-X = df.drop(columns=["loan_id", "loan_status"])
-y = df["loan_status"]
-
-print(X.head())
-print(y.value_counts())
+sns.violinplot(data=df, x="loan_status", y="loan_amount")
+plt.show()
 ```
 
-### 7. Split the dataset
+Violin plots can show differences in distribution shape, including multiple concentrations. Their appearance depends on density estimation and smoothing, so they should be interpreted alongside the sample size and underlying data.
 
-The data is split into training and testing sets. The model learns from the training set and is evaluated on the test set.
+### 6. Correlation Heatmaps
+
+A **correlation heatmap** uses colors to represent correlation values between numerical variables. Correlation measures the strength and direction of an association.
+
+The Pearson correlation coefficient ranges from -1 to +1:
+- +1 indicates a perfect positive linear relationship.
+- -1 indicates a perfect negative linear relationship.
+- 0 indicates no linear relationship.
 
 ```python
-from sklearn.model_selection import train_test_split
+correlation = df.select_dtypes(include="number").corr()
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X,
-    y,
-    test_size=0.2,
-    random_state=42,
-    stratify=y
+sns.heatmap(
+    correlation,
+    annot=True,
+    cmap="coolwarm",
+    center=0
 )
 
-print(X_train.shape)
-print(X_test.shape)
+plt.show()
 ```
 
-- `test_size=0.2` reserves 20% of the data for testing.
-- `random_state=42` makes the split reproducible.
-- `stratify=y` helps preserve the class proportions in both sets.
+Heatmaps make it easier to identify pairs of numerical features with strong positive or negative correlations. Correlation does not prove causation, and a low Pearson correlation does not rule out a non-linear relationship.
 
-### 8. Encode categorical features
+### 7. Chart Selection
 
-Most machine learning algorithms need numerical input. One-hot encoding converts categories into numerical indicator columns.
+The chart should match the type of data and the question being examined.
 
-```python
-from sklearn.preprocessing import OneHotEncoder
-from sklearn.compose import ColumnTransformer
+| Purpose | Suitable chart |
+|---|---|
+| Compare values across categories | Bar chart |
+| Show change over ordered time | Line chart |
+| Show totals or contributions over time | Area chart |
+| Examine a numerical distribution | Histogram or density plot |
+| Examine the relationship between two numerical variables | Scatter plot |
+| Compare spread and possible outliers across groups | Box plot |
+| Compare distribution shapes across groups | Violin plot |
+| Examine correlations among numerical variables | Correlation heatmap |
 
-cat_features = ["education", "self_employed"]
-num_features = [col for col in X.columns if col not in cat_features]
+Choosing a chart based only on appearance can hide important information. The purpose of the visualization should determine the chart type.
 
-preprocessor = ColumnTransformer(
-    transformers=[
-        ("cat", OneHotEncoder(handle_unknown="ignore"), cat_features),
-        ("num", "passthrough", num_features)
-    ]
-)
+### 8. Visualization Limitations and Misleading Graphs
 
-X_train_encoded = preprocessor.fit_transform(X_train)
-X_test_encoded = preprocessor.transform(X_test)
+A chart can communicate data clearly, but poor design or inappropriate choices can create a misleading impression.
 
-print(X_train_encoded.shape)
-print(X_test_encoded.shape)
-```
+Common issues include:
 
-The encoder is fitted using training data only. The same fitted encoder transforms the test data. This prevents the test set from influencing the learned preprocessing.
+- **Misleading axis scales:** A truncated axis can make small differences appear very large.
+- **Unequal intervals:** Irregular spacing on an axis can distort the visual relationship.
+- **Inappropriate chart types:** A line joining unrelated categories can suggest an order or continuity that does not exist.
+- **Overloaded charts:** Too many categories, colors or labels can make patterns difficult to interpret.
+- **Missing context:** Omitting units, sample size, time period or data source can lead to incorrect conclusions.
+- **Correlation mistaken for causation:** A visible relationship does not prove that one variable causes another.
+- **Small or biased samples:** A visually clear chart can still represent incomplete or unrepresentative data.
 
-### 9. Final checks
-
-```python
-print("Training rows:", X_train_encoded.shape[0])
-print("Testing rows:", X_test_encoded.shape[0])
-
-print("Training target distribution:")
-print(y_train.value_counts(normalize=True))
-
-print("Testing target distribution:")
-print(y_test.value_counts(normalize=True))
-```
-
-At this point, the features are separated, categorical columns are encoded and the data is split for model training and evaluation.
-
-### Practice task
-
-1. Load the loan dataset and inspect its shape and columns.
-2. Check missing values and duplicate rows.
-3. Inspect categorical values and numerical ranges.
-4. Separate `loan_status` from the input features.
-5. Split the data into training and testing sets.
-6. Encode categorical columns using a preprocessing step fitted only on training data.
-
-**Practical objective:** Prepare a real loan approval dataset for classification while checking data quality and avoiding preprocessing leakage.
-
-**Dataset note:** The steps above describe the Loan Approval Prediction dataset used in this task. No outlier removal or model training result is claimed in this Day 12 README.
-
-**GeeksforGeeks references**
-- [Scikit-learn train_test_split](https://www.geeksforgeeks.org/machine-learning/ml-sklearn-model-selection-train-test-split/)
-- [One-Hot Encoding](https://www.geeksforgeeks.org/machine-learning/ml-one-hot-encoding/)
-- [Pandas DataFrame](https://www.geeksforgeeks.org/python/python-pandas-dataframe/)
+A good visualization should use accurate scales, clear titles, axis labels, units and legends where needed. The chart should show the data without hiding relevant context or exaggerating differences.
