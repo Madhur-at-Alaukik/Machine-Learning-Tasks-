@@ -133,3 +133,50 @@ A **business objective** describes the practical outcome that the model is inten
 For example, a loan approval prediction system should not be judged only by overall accuracy. The effects of incorrect approvals and incorrect rejections, the quality of the available data and the need for human review may also matter.
 
 A successful ML workflow connects the technical prediction task with the real decision it is intended to support. Model performance, practical usefulness and limitations should all be considered.
+
+
+## Additional Learning — Training and Evaluating Logistic Regression
+
+A Logistic Regression classifier was trained on the prepared loan dataset. Although its name includes "regression", it is commonly used for classification. It estimates class probabilities and assigns a class according to its decision rule.
+
+```python
+from sklearn.linear_model import LogisticRegression
+
+model = LogisticRegression(max_iter=1000)
+
+model.fit(X_train_encoded, y_train)
+
+y_pred = model.predict(X_test_encoded)
+```
+
+- `fit()` trains the model using the training features and target.
+- `predict()` generates class predictions for the test features.
+- `max_iter=1000` allows the optimization process more iterations to converge.
+
+The predictions were evaluated using accuracy and a classification report.
+
+```python
+from sklearn.metrics import accuracy_score, classification_report
+
+print("Accuracy:", accuracy_score(y_test, y_pred))
+print(classification_report(y_test, y_pred))
+```
+
+The classification report includes precision, recall, F1-score and support for each class. These class-wise values are important when the model may perform differently for approved and rejected applications.
+
+For the confusion matrix shared during this exercise, the counts were:
+
+| Actual / Predicted | Approved | Rejected |
+|---|---:|---:|
+| Approved | 485 | 43 |
+| Rejected | 118 | 203 |
+
+Based on these counts, the model correctly predicted 485 approved cases and 203 rejected cases. It incorrectly predicted 43 approved cases as rejected and 118 rejected cases as approved.
+
+The accuracy calculated from the matrix is:
+
+```text
+(485 + 203) / (485 + 43 + 118 + 203) × 100 = 81.04%
+```
+
+Accuracy gives the proportion of all test predictions that were correct. It does not show how well each class was identified, so it should be considered together with precision, recall, F1-score and the confusion matrix.
