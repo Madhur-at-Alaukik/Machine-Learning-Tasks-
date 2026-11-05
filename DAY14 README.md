@@ -1,193 +1,135 @@
 # Machine Learning – Daily Task Update
-## Module 4: Supervised Machine Learning
-## Day 14: Model Evaluation, Cross-Validation and Hyperparameter Tuning
+## Day 14: ML Workflow and Problem Formulation
 
-After training more than one model, the next step is to evaluate the results carefully and improve the model settings. For the Loan Approval Prediction task, this means checking whether the model performs consistently and whether its settings can be improved without using the test set for tuning.
+### 1. Supervised, Unsupervised and Reinforcement Learning
 
-### 1. Why model evaluation matters
+Machine learning methods are commonly grouped according to the type of feedback or information available during training.
 
-A model should not be selected using only its training performance. It must also perform well on data that was not used to train it.
+**Supervised learning** uses examples that contain input features and known target values. The model learns a relationship between inputs and targets so it can predict targets for new observations. Classification and regression are supervised-learning tasks.
 
-For a classification problem, common evaluation metrics are:
+Examples include predicting loan approval from applicant information and estimating house prices from property features.
 
-- **Accuracy:** Percentage of all predictions that are correct.
-- **Precision:** How many predictions for a particular class were correct.
-- **Recall:** How many actual examples of a class were identified.
-- **F1-score:** Harmonic mean of precision and recall.
-- **Confusion matrix:** Shows correct and incorrect predictions for each class.
+**Unsupervised learning** uses data without a supplied target label. The objective is to identify structure or patterns in the data, such as groups of similar observations or unusual records.
 
-In the loan dataset, both Approved and Rejected predictions should be checked. A wrong approval and a wrong rejection can have different consequences.
+Examples include customer segmentation and clustering similar documents.
 
-### 2. Understand overfitting and underfitting
+**Reinforcement learning** involves an agent that interacts with an environment, takes actions and receives rewards or penalties. The agent learns a policy for choosing actions in order to maximize cumulative reward over time.
 
-**Overfitting** happens when a model learns the training data too closely, including noise or details that do not generalize. It may perform very well on training data but poorly on unseen data.
+Examples include game-playing agents and systems that learn control strategies through interaction.
 
-**Underfitting** happens when a model is too simple to learn the important patterns. It performs poorly on both training and test data.
+The three approaches differ in the type of learning signal: known target labels, structure in unlabelled data, or rewards from interaction with an environment.
 
-A useful first check is to compare training and test accuracy:
+### 2. Regression and Classification
 
-```python
-train_pred = rf_model.predict(X_train_encoded)
-test_pred = rf_model.predict(X_test_encoded)
-
-print("Training accuracy:",
-      accuracy_score(y_train, train_pred))
-
-print("Testing accuracy:",
-      accuracy_score(y_test, test_pred))
-```
-
-A large gap can be a sign of overfitting, although the result should be interpreted with the model and dataset in mind.
-
-### 3. Understand cross-validation
-
-A single train-test split can give a result that depends on which rows happen to be in the test set. Cross-validation gives a more stable estimate by repeating training and validation across different folds.
-
-In **k-fold cross-validation**, the training data is divided into k parts. The model trains on k-1 parts and validates on the remaining part. This process repeats until each part has been used for validation.
-
-```python
-from sklearn.model_selection import cross_val_score
-from sklearn.ensemble import RandomForestClassifier
-
-rf_model = RandomForestClassifier(
-    n_estimators=100,
-    random_state=42
-)
-
-scores = cross_val_score(
-    rf_model,
-    X_train_encoded,
-    y_train,
-    cv=5,
-    scoring="accuracy"
-)
-
-print("Fold scores:", scores)
-print("Average accuracy:", scores.mean())
-```
-
-This example evaluates a Random Forest using five folds. For a more reliable workflow, preprocessing should be included inside a Scikit-learn Pipeline so that the encoder is fitted separately inside each fold. The next section demonstrates this approach.
-
-### 4. Understand hyperparameters
-
-**Parameters** are values a model learns during training, such as the weights in Logistic Regression.
-
-**Hyperparameters** are settings chosen before or during model selection. They control how the model learns.
+**Regression** predicts a numerical quantity. The predicted output is generally continuous, such as a price, temperature, demand or delivery time.
 
 Examples:
+- Predicting the selling price of a house.
+- Estimating monthly sales.
+- Predicting the time required for a delivery.
 
-| Model | Hyperparameter | Purpose |
-|---|---|---|
-| Decision Tree | `max_depth` | Limits tree depth |
-| Random Forest | `n_estimators` | Number of trees |
-| Random Forest | `max_depth` | Maximum depth of each tree |
-| Logistic Regression | `C` | Controls regularization strength |
+**Classification** predicts a class or category. The output may be one of two classes or one among several classes.
 
-Different settings can lead to different results. The best values should be selected using training data and validation, not by repeatedly checking the test set.
+Examples:
+- Predicting whether a loan is approved or rejected.
+- Classifying an email as spam or not spam.
+- Identifying the type of an image.
 
-### 5. Hyperparameter tuning with GridSearchCV
+The target column determines the problem type. Predicting a number is generally regression, while predicting a category is classification. The choice of model and evaluation method should match the problem type.
 
-Grid Search tries the parameter combinations provided in a grid and evaluates them using cross-validation.
+### 3. Features, Targets and Predictions
 
-The following example places preprocessing and the Random Forest inside one Pipeline. This is important because the encoder is fitted only on each fold's training portion during cross-validation.
+A **feature** is an input variable used by a model to make a prediction. A dataset can contain one feature or many features. Features may be numerical or categorical.
 
-```python
-from sklearn.compose import ColumnTransformer
-from sklearn.preprocessing import OneHotEncoder
-from sklearn.pipeline import Pipeline
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import GridSearchCV
+The **target** is the value the model is intended to predict. In supervised learning, the target is known for the training examples.
 
-cat_features = ["education", "self_employed"]
-num_features = [col for col in X_train.columns if col not in cat_features]
+A **prediction** is the model's output for an input observation. It may be a numerical estimate in regression or a predicted class in classification. Some classifiers can also return class probabilities.
 
-preprocessor = ColumnTransformer(
-    transformers=[
-        ("cat", OneHotEncoder(handle_unknown="ignore"), cat_features),
-        ("num", "passthrough", num_features)
-    ]
-)
+For a loan approval dataset:
+- Features may include annual income, loan amount, loan term and CIBIL score.
+- Target may be loan status.
+- Prediction may be Approved or Rejected.
 
-pipeline = Pipeline(steps=[
-    ("preprocessor", preprocessor),
-    ("model", RandomForestClassifier(random_state=42))
-])
+Identifiers that only distinguish records should not automatically be used as predictive features. A feature should have a meaningful relationship to the problem and be available at the time a prediction is made.
 
-param_grid = {
-    "model__n_estimators": [100, 200],
-    "model__max_depth": [None, 10, 20],
-    "model__min_samples_split": [2, 5]
-}
+### 4. Problem Formulation
 
-grid_search = GridSearchCV(
-    pipeline,
-    param_grid,
-    cv=5,
-    scoring="accuracy",
-    n_jobs=-1
-)
+**Problem formulation** means converting a real-world requirement into a clear machine learning task. It should be completed before selecting an algorithm because the problem definition determines what data, target, model type and evaluation approach are appropriate.
 
-grid_search.fit(X_train, y_train)
+A well-defined problem should identify:
 
-print("Best parameters:", grid_search.best_params_)
-print("Best cross-validation score:", grid_search.best_score_)
-```
+1. **Objective:** What decision, estimate or outcome should the model support?
+2. **Prediction unit:** What does one row or observation represent?
+3. **Target:** What exact value should be predicted?
+4. **Features:** Which information will be available when the prediction is made?
+5. **Problem type:** Is the task classification, regression or another learning problem?
+6. **Success measure:** How will model performance be assessed?
+7. **Constraints:** Are there limits related to data availability, prediction time, interpretation or the cost of errors?
 
-The `model__` prefix tells GridSearchCV that the parameter belongs to the model step of the Pipeline.
+For example, "predict loan approval" is more useful when defined precisely: predict the loan status for each application using the applicant and financial information available at the time the application is assessed.
 
-### 6. Evaluate the tuned model on the test set
+Problem formulation should also reflect the business objective. A technically accurate prediction may not be useful if it does not support the decision or outcome the organisation needs.
 
-The test set should be used after model selection is complete. It gives a final evaluation on data that was not used to choose the hyperparameters.
+### 5. Dataset Splitting
 
-```python
-from sklearn.metrics import accuracy_score, classification_report
-from sklearn.metrics import ConfusionMatrixDisplay
-import matplotlib.pyplot as plt
+Dataset splitting separates observations into different subsets for model development and evaluation.
 
-best_model = grid_search.best_estimator_
+**Training set:** Used to fit the model. The model learns its parameters from this data.
 
-test_pred = best_model.predict(X_test)
+**Validation set:** Used during model development to compare approaches or select settings. It provides feedback without using the final test set.
 
-print("Test accuracy:",
-      accuracy_score(y_test, test_pred))
+**Test set:** Kept separate until the final evaluation. It estimates how the selected model performs on data that was not used to train or select it.
 
-print(classification_report(y_test, test_pred))
+A common approach is to reserve a portion of the dataset for testing and use the remaining data for training and validation. The exact proportions depend on the dataset size and task.
 
-ConfusionMatrixDisplay.from_estimator(
-    best_model,
-    X_test,
-    y_test
-)
+For classification, a **stratified split** can help preserve the approximate proportion of each target class in the subsets. A split should also respect the data structure: related observations or time-ordered records may require a group-based or time-aware approach rather than an ordinary random split.
 
-plt.show()
-```
+The test set should not be repeatedly used to choose features, model settings or preprocessing methods. Doing so makes it part of the development process and weakens the final evaluation.
 
-The final test score may be different from the cross-validation score. That is normal because they are calculated on different data.
+### 6. Baseline Models
 
-### 7. Important points to remember
+A **baseline model** is a simple reference point used to judge whether a more advanced model provides meaningful improvement.
 
-- Use the same test set only for final evaluation.
-- Do not select hyperparameters by repeatedly checking test performance.
-- Put data preprocessing inside a Pipeline when using cross-validation.
-- Compare precision, recall and F1-score for both classes.
-- A higher accuracy does not always mean a safer or more useful loan prediction model.
-- Keep a record of the model settings and evaluation results so the experiment can be repeated.
+For classification, a basic baseline may always predict the most frequent class. For regression, a baseline may predict the mean or median target value from the training data.
 
-### Practice task
+A baseline is useful because a model's score has little meaning without a reference. If a complex model performs no better than a simple baseline, its additional complexity may not be justified.
 
-1. Compare training and test accuracy for a model.
-2. Run five-fold cross-validation on the training data.
-3. Create a Pipeline that includes preprocessing and a Random Forest.
-4. Use GridSearchCV to try different values of `n_estimators`, `max_depth` and `min_samples_split`.
-5. Evaluate the selected model once on the test set.
-6. Compare the tuned model's classification report and confusion matrix with the earlier Logistic Regression result.
+The baseline must use only information available in the training data. Its evaluation should use the same validation or test strategy as the models being compared.
 
-**Practical objective:** Understand model generalization, use cross-validation to compare settings and tune a classifier without leaking test data into model selection.
+### 7. Training and Inference
 
-**Note:** This README introduces the next practical learning step. No cross-validation or hyperparameter tuning result is claimed as completed until the code is run.
+**Training** is the process in which a model uses training data to learn its parameters. During training, the model adjusts these parameters according to its learning method and objective.
 
-**GeeksforGeeks references**
-- [Overfitting and Underfitting](https://www.geeksforgeeks.org/machine-learning/underfitting-and-overfitting-in-machine-learning/)
-- [Cross-Validation](https://www.geeksforgeeks.org/machine-learning/cross-validation-in-machine-learning/)
-- [GridSearchCV](https://www.geeksforgeeks.org/machine-learning/hyperparameter-tuning/)
-- [Scikit-learn Pipeline](https://www.geeksforgeeks.org/machine-learning/scikit-learn-pipeline/)
+**Inference** is the process of using a trained model to generate predictions for new input data. Inference does not normally involve learning new model parameters.
+
+A typical sequence is:
+
+1. Prepare the training data.
+2. Fit the model using the training examples.
+3. Save or retain the fitted model and required preprocessing steps.
+4. Provide new input data in the expected format.
+5. Apply the same preprocessing and generate predictions.
+
+The preprocessing used during inference must match the preprocessing used during training. For example, categorical encoding and numerical transformations should use the fitted training transformations rather than being recalculated independently for every new input.
+
+### 8. Model Lifecycle and Business Objectives
+
+The **machine learning model lifecycle** describes the stages involved in developing and using a model.
+
+A typical lifecycle includes:
+1. Understand the problem and business objective.
+2. Identify and collect relevant data.
+3. Inspect, prepare and transform the data.
+4. Define features and target.
+5. Split the data and establish a baseline.
+6. Train suitable models.
+7. Evaluate and compare model performance.
+8. Select a model according to the objective and constraints.
+9. Use the model to generate predictions.
+10. Review its performance and limitations as the environment or data changes.
+
+A **business objective** describes the practical outcome that the model is intended to support. It should be connected to the model's target and evaluation criteria.
+
+For example, a loan approval prediction system should not be judged only by overall accuracy. The effects of incorrect approvals and incorrect rejections, the quality of the available data and the need for human review may also matter.
+
+A successful ML workflow connects the technical prediction task with the real decision it is intended to support. Model performance, practical usefulness and limitations should all be considered.
