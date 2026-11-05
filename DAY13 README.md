@@ -1,205 +1,155 @@
 # Machine Learning – Daily Task Update
-## Module 4: Supervised Machine Learning
-## Day 13: Training and Comparing Classification Models
+## Day 13: Exploratory Data Analysis and Feature Engineering
 
-For Day 13, I used the prepared Loan Approval Prediction dataset to train a classification model. The target column is `loan_status`, which contains the loan decision. The goal is to learn from the applicant information and predict whether a loan is approved or rejected.
+### 1. Univariate, Bivariate and Multivariate Analysis
 
-### 1. Understand the classification problem
+**Exploratory Data Analysis (EDA)** is the process of examining a dataset to understand its structure, distributions, relationships and unusual observations before building a machine learning model.
 
-This is a **binary classification** problem because the target has two classes:
+EDA can be performed at three levels:
 
-- Approved
-- Rejected
+**Univariate analysis** studies one variable at a time. It helps describe the distribution, typical value, spread, missing values and unusual observations of a feature. Numerical variables can be examined using summary statistics, histograms and box plots. Categorical variables can be examined using frequency tables and bar charts.
 
-The input features include details such as income, loan amount, loan term, CIBIL score and asset values. The `loan_id` column is an identifier and should not be used as a predictive feature.
+**Bivariate analysis** studies the relationship between two variables. Examples include comparing income with loan amount, or examining loan status across education categories. Scatter plots, grouped summaries, box plots and correlation values can help describe these relationships.
 
-### 2. Train a Logistic Regression model
+**Multivariate analysis** examines three or more variables together. It helps identify relationships that may not be clear when variables are studied separately. Grouped comparisons, correlation heatmaps and plots using color or size to represent additional variables can support this analysis.
 
-Logistic Regression is a classification algorithm that estimates the probability of a class. It is a useful first model because it provides a simple baseline for comparison.
+EDA describes patterns in the available data. A pattern or association found during EDA should not automatically be interpreted as a causal relationship.
 
-```python
-from sklearn.linear_model import LogisticRegression
+### 2. Feature-Target Relationships
 
-model = LogisticRegression(max_iter=1000)
+A **feature** is an input variable used by a model to make a prediction. The **target** is the value the model is expected to predict.
 
-model.fit(X_train_encoded, y_train)
+Feature-target analysis examines how each input feature relates to the target. For a numerical target, this may involve examining scatter plots, distributions and correlation. For a categorical target, numerical features can be compared across target classes, while categorical features can be examined using group counts or proportions.
 
-print("Model trained successfully!")
-```
+For example, in a loan approval dataset:
+- Features may include annual income, loan amount, CIBIL score and asset values.
+- The target may be loan status.
+- Analysis can compare the distributions of income or CIBIL score for approved and rejected cases.
 
-- `fit()` trains the model using the training data.
-- `max_iter=1000` allows more iterations for the model to converge.
+A feature may show a relationship with the target without being sufficient on its own to make accurate predictions. The relationship should also be checked for data leakage: a feature must not contain information that would only become available after the prediction decision.
 
-### 3. Make predictions
+### 3. Correlation Analysis
 
-After training, use the test features to predict loan status.
+**Correlation** measures the strength and direction of association between two variables. It is commonly used during EDA to understand whether numerical features move together.
 
-```python
-y_pred = model.predict(X_test_encoded)
+The Pearson correlation coefficient ranges from -1 to +1:
+- **Positive correlation:** Higher values of one variable tend to occur with higher values of the other.
+- **Negative correlation:** Higher values of one variable tend to occur with lower values of the other.
+- **Near-zero correlation:** Little or no linear association is detected.
 
-print("Actual values:")
-print(y_test.head(10).tolist())
+A correlation matrix shows pairwise correlations among numerical columns and can be displayed as a heatmap.
 
-print("Predicted values:")
-print(y_pred[:10])
-```
+Correlation is useful for identifying possible redundant features or relationships worth investigating. However, it has limitations:
+- Pearson correlation measures linear association and may miss non-linear patterns.
+- Outliers can strongly affect correlation values.
+- Correlation does not establish causation.
+- A low correlation with the target does not necessarily mean a feature has no predictive value.
+- Relationships among several features can be more complex than pairwise correlations show.
 
-The test set is kept separate from model training so that evaluation measures performance on data the model did not learn from.
+### 4. Feature Creation and Transformation
 
-### 4. Check model accuracy
+**Feature engineering** is the process of creating or transforming input variables so that they represent useful information for a model.
 
-Accuracy measures the proportion of test predictions that were correct.
-
-```python
-from sklearn.metrics import accuracy_score
-
-accuracy = accuracy_score(y_test, y_pred)
-
-print("Model Accuracy:", round(accuracy * 100, 2), "%")
-```
-
-Accuracy is useful, but it should not be the only metric considered. A model can have good overall accuracy while performing poorly on one class.
-
-### 5. Understand the classification report
+**Feature creation** combines or derives information from existing columns. For example, total assets could be calculated by adding several asset-value columns when that total is meaningful for the problem.
 
 ```python
-from sklearn.metrics import classification_report
-
-print(classification_report(y_test, y_pred))
-```
-
-The report contains:
-
-- **Precision:** Of the predictions made for a class, how many were correct?
-- **Recall:** Of the actual examples in a class, how many did the model identify?
-- **F1-score:** A balance between precision and recall.
-- **Support:** Number of actual test examples in each class.
-
-For loan approval, check the metrics for both Approved and Rejected classes.
-
-### 6. Read the confusion matrix
-
-```python
-from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
-import matplotlib.pyplot as plt
-
-cm = confusion_matrix(y_test, y_pred)
-
-display = ConfusionMatrixDisplay(
-    confusion_matrix=cm,
-    display_labels=model.classes_
+df["total_assets"] = (
+    df["residential_assets_value"]
+    + df["commercial_assets_value"]
+    + df["luxury_assets_value"]
+    + df["bank_asset_value"]
 )
-
-display.plot()
-plt.show()
 ```
 
-The rows represent actual labels and the columns represent predicted labels.
+**Feature transformation** changes the representation or scale of a feature. Examples include applying a logarithmic transformation to a highly skewed positive variable, converting a date into separate components, or converting a measurement into a meaningful ratio.
 
-For the Logistic Regression run shared during this task, the confusion matrix was:
+A derived feature should have a clear meaning and should be available at the time the model is expected to make its prediction. Transformations should be selected based on the data distribution and the requirements of the model.
 
-| Actual / Predicted | Approved | Rejected |
-|---|---:|---:|
-| Approved | 485 | 43 |
-| Rejected | 118 | 203 |
+### 5. Date/Time Feature Extraction
 
-From this matrix:
-
-- 485 approved loans were predicted correctly.
-- 43 approved loans were predicted as rejected.
-- 118 rejected loans were predicted as approved.
-- 203 rejected loans were predicted correctly.
-
-The accuracy from these counts is:
-
-```text
-(485 + 203) / (485 + 43 + 118 + 203) × 100
-= 81.04%
-```
-
-The model identified approved loans more successfully than rejected loans in this test run. In particular, 118 rejected loans were predicted as approved. This is why it is important to check class-wise precision and recall rather than relying only on accuracy.
-
-### 7. Train a Decision Tree model
-
-A Decision Tree makes a prediction by asking a sequence of questions based on feature values. It can learn non-linear decision rules and is relatively easy to visualize.
+Date and time columns can contain information about trends, cycles and timing. A timestamp can be separated into useful components such as year, month, day, weekday or hour.
 
 ```python
-from sklearn.tree import DecisionTreeClassifier
+df["date"] = pd.to_datetime(df["date"])
 
-dt_model = DecisionTreeClassifier(
-    max_depth=10,
-    random_state=42
-)
-
-dt_model.fit(X_train_encoded, y_train)
-
-dt_pred = dt_model.predict(X_test_encoded)
-
-print("Decision Tree Accuracy:",
-      accuracy_score(y_test, dt_pred) * 100)
-
-print(classification_report(y_test, dt_pred))
+df["year"] = df["date"].dt.year
+df["month"] = df["date"].dt.month
+df["day"] = df["date"].dt.day
+df["weekday"] = df["date"].dt.dayofweek
 ```
 
-The `max_depth` parameter limits how deep the tree can grow. Limiting depth can help control overfitting.
+These features can help a model represent seasonal or calendar-related patterns. The components selected should match the problem. For example, month may be useful for seasonal behaviour, while hour may be useful for hourly demand.
 
-### 8. Train a Random Forest model
+Date-derived features must respect the prediction time. Using a date or timestamp that contains information from after the event being predicted can cause target leakage.
 
-Random Forest combines predictions from multiple Decision Trees. Each tree is trained using a sample of the training data and a selection of features. The final classification is based on the trees' combined vote.
+### 6. Feature Selection Fundamentals
+
+**Feature selection** is the process of choosing which existing features should be used as model inputs. The goal is to retain useful information while reducing irrelevant, redundant or noisy features.
+
+Feature selection can:
+- Reduce unnecessary complexity.
+- Make models easier to interpret.
+- Reduce training time and memory use.
+- Help limit overfitting when irrelevant features are removed.
+
+Feature selection is different from feature engineering. Feature engineering creates or transforms features; feature selection chooses among available features.
+
+Selection decisions should be made using training data only. Choosing features after looking at test-set performance can leak information from the test set into the modelling process.
+
+### 7. Low-Variance and Redundant Features
+
+A **low-variance feature** has values that are nearly the same for most observations. Because it changes very little, it may provide limited information for distinguishing records. A constant feature is an extreme case of zero variance.
+
+Low variance does not always mean a feature is useless. A rare category or an uncommon indicator may be important for a particular prediction problem, so the context should be considered before removing it.
+
+**Redundant features** contain overlapping information. For example, two columns may measure nearly the same quantity or have a very strong correlation. Redundant inputs can make a model more complex and may make some model coefficients harder to interpret.
+
+Correlation analysis can help identify possible redundancy, but highly correlated features should not automatically be removed. Their definitions, usefulness and behaviour with the chosen model should be examined.
+
+### 8. Categorical Encoding
+
+Categorical features contain labels rather than numerical measurements. Many ML algorithms require these values to be converted into numerical representations.
+
+**One-hot encoding** creates a separate binary column for each category. A row receives 1 in the column corresponding to its category and 0 in the other category columns.
+
+For example, a feature with values `Graduate` and `Not Graduate` can become two indicator columns.
 
 ```python
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.preprocessing import OneHotEncoder
 
-rf_model = RandomForestClassifier(
-    n_estimators=100,
-    random_state=42
-)
-
-rf_model.fit(X_train_encoded, y_train)
-
-rf_pred = rf_model.predict(X_test_encoded)
-
-print("Random Forest Accuracy:",
-      accuracy_score(y_test, rf_pred) * 100)
-
-print(classification_report(y_test, rf_pred))
+encoder = OneHotEncoder(handle_unknown="ignore")
 ```
 
-- `n_estimators=100` creates a forest of 100 trees.
-- `random_state=42` makes the random process reproducible.
+One-hot encoding does not create an artificial ranking between categories. It can, however, create many columns when the original feature contains many distinct categories.
 
-### 9. Compare the models
+**Ordinal encoding** assigns integer values to categories that have a meaningful order. It should be used only when that order is real and understood. Assigning arbitrary numbers to unordered categories can make some models interpret a false numerical relationship.
 
-Use the same train-test split for all models so that the comparison is fair.
+Encoding must be fitted using training data only. Categories that appear later in validation, test or production data should be handled deliberately.
 
-```python
-results = {
-    "Logistic Regression": accuracy_score(y_test, y_pred),
-    "Decision Tree": accuracy_score(y_test, dt_pred),
-    "Random Forest": accuracy_score(y_test, rf_pred)
-}
+### 9. High-Cardinality Categorical Features
 
-for name, score in results.items():
-    print(name, ":", round(score * 100, 2), "%")
-```
+A categorical feature has **high cardinality** when it contains a large number of distinct categories. Examples can include customer IDs, product codes, postcodes or website URLs.
 
-Compare the classification reports and confusion matrices as well as accuracy. A model with a higher accuracy is not automatically the best choice if it performs poorly on an important class.
+One-hot encoding a high-cardinality column may create a very large number of features. Many categories may also have only a few observations, which can make patterns difficult to estimate reliably.
 
-### Practice task
+Possible approaches include grouping rare categories when appropriate, using domain-based grouping, applying suitable encoding methods or excluding identifiers that do not contain useful predictive information.
 
-1. Train Logistic Regression, Decision Tree and Random Forest models.
-2. Generate predictions for the same test set.
-3. Compare their accuracy scores.
-4. Read precision, recall and F1-score for both loan classes.
-5. Plot a confusion matrix for each model.
-6. Note which model makes fewer incorrect approvals and incorrect rejections.
+The correct approach depends on what the category represents. A high number of unique values is not, by itself, a reason to remove a feature.
 
-**Practical objective:** Train multiple classification algorithms and compare their performance using accuracy, classification reports and confusion matrices.
+### 10. Target Encoding and Its Leakage Risks
 
-**Result recorded:** Logistic Regression achieved 81.04% accuracy based on the confusion matrix shared for this task. Decision Tree and Random Forest were set up as comparison exercises; their final scores were not recorded here.
+**Target encoding** replaces a category with a statistic calculated from the target values associated with that category. For a classification task, this may be the proportion of positive target examples within each category. For a regression task, it may be the average target value.
 
-**GeeksforGeeks references**
-- [Logistic Regression](https://www.geeksforgeeks.org/machine-learning/understanding-logistic-regression/)
-- [Decision Tree](https://www.geeksforgeeks.org/machine-learning/decision-tree/)
-- [Random Forest](https://www.geeksforgeeks.org/machine-learning/random-forest-algorithm-in-machine-learning/)
-- [Confusion Matrix](https://www.geeksforgeeks.org/machine-learning/confusion-matrix-machine-learning/)
+For example, a category may be represented by the historical approval rate for that category. This can provide a compact numerical representation for a high-cardinality feature.
+
+The main risk is **target leakage**. If the target statistics are calculated using the same rows that are later used to train the model, each row's target can influence its own encoded feature. This can produce overly optimistic training results.
+
+Target encoding should be calculated using training folds only. Out-of-fold encoding calculates category statistics from other folds and applies them to the held-out fold. Validation and test data must be transformed using mappings learned from the relevant training data, with a defined fallback for unseen categories.
+
+### 11. Class Imbalance Overview
+
+**Class imbalance** occurs when target classes have substantially different numbers of observations. For example, a dataset may contain many more approved loans than rejected loans.
+
+A model trained on imbalanced data may favour the majority class and perform poorly on the minority class. High overall accuracy can hide this problem.
+
+The class distribution should be inspected before training. Evaluation should consider precision, recall and F1-score for each class, along with the confusion matrix. The appropriate approach depends on the problem and the cost of different prediction errors.
