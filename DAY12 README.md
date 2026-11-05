@@ -159,3 +159,34 @@ Common issues include:
 - **Small or biased samples:** A visually clear chart can still represent incomplete or unrepresentative data.
 
 A good visualization should use accurate scales, clear titles, axis labels, units and legends where needed. The chart should show the data without hiding relevant context or exaggerating differences.
+
+
+## Additional Learning — Visualizing a Model's Confusion Matrix
+
+A confusion matrix can also be displayed as a heatmap-style chart. This provides a visual way to compare actual classes with the classes predicted by a classifier.
+
+In the loan approval model exercise, the matrix was:
+
+| Actual / Predicted | Approved | Rejected |
+|---|---:|---:|
+| Approved | 485 | 43 |
+| Rejected | 118 | 203 |
+
+The vertical axis represents the actual class and the horizontal axis represents the predicted class. The diagonal cells contain correct predictions, while the other cells contain incorrect predictions.
+
+```python
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+import matplotlib.pyplot as plt
+
+cm = confusion_matrix(y_test, y_pred)
+
+display = ConfusionMatrixDisplay(
+    confusion_matrix=cm,
+    display_labels=model.classes_
+)
+
+display.plot()
+plt.show()
+```
+
+The chart makes it easier to see which class the model predicts correctly and where it makes mistakes. It is important to read the axis labels before interpreting the cells, because reversing actual and predicted labels changes the meaning of the results.
